@@ -6,7 +6,15 @@ import {
   IndianRupee,
   Boxes,
   Percent,
+  ShoppingCart,
+  Users,
+  RotateCcw,
+  Package,
+  Wallet,
+  CreditCard,
+  CalendarDays,
 } from "lucide-react";
+
 import {
   BarChart,
   Bar,
@@ -17,10 +25,16 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import WaveGraphSection from "../components/WaveGraph";
 
 export default function Dashboard() {
 
-  // 🔹 Best Selling Products (Top one will go in Card)
+
   const bestProducts = [
     {
       name: "Co Men's plain satin shirt",
@@ -75,6 +89,136 @@ export default function Dashboard() {
       percent: 3.63,
     },
   ];
+
+
+
+   const salesData = [
+    { date: "2026-02-14", amount: 5000, qty: 3, customer: 1 },
+    { date: "2026-02-10", amount: 8000, qty: 5, customer: 2 },
+    { date: "2026-01-25", amount: 12000, qty: 7, customer: 3 },
+  ];
+
+  const [filter, setFilter] = useState("today");
+  const [customRange, setCustomRange] = useState({
+    start: "",
+    end: "",
+  });
+
+  const today = new Date().toISOString().split("T")[0];
+
+  // Filter Logic
+  const filteredData = useMemo(() => {
+    const now = new Date();
+
+    return salesData.filter((item) => {
+      const itemDate = new Date(item.date);
+
+      if (filter === "today") {
+        return item.date === today;
+      }
+
+      if (filter === "lastWeek") {
+        const lastWeek = new Date();
+        lastWeek.setDate(now.getDate() - 7);
+        return itemDate >= lastWeek;
+      }
+
+      if (filter === "lastMonth") {
+        const lastMonth = new Date();
+        lastMonth.setMonth(now.getMonth() - 1);
+        return itemDate >= lastMonth;
+      }
+
+      if (filter === "custom") {
+        if (!customRange.start || !customRange.end) return true;
+        return (
+          itemDate >= new Date(customRange.start) &&
+          itemDate <= new Date(customRange.end)
+        );
+      }
+
+      return true;
+    });
+  }, [filter, customRange]);
+
+  // Calculations
+  const totalSales = filteredData.reduce((sum, item) => sum + item.amount, 0);
+  const totalQty = filteredData.reduce((sum, item) => sum + item.qty, 0);
+  const totalCustomers = filteredData.reduce(
+    (sum, item) => sum + item.customer,
+    0
+  );
+
+const stats = [
+  {
+    title: "Total Sales",
+    value: `₹${totalSales}`,
+    icon: IndianRupee,
+    color: "bg-emerald-100",
+  },
+  {
+    title: "Total Invoice",
+    value: filteredData.length,
+    icon: Receipt,
+    color: "bg-sky-100",
+  },
+  {
+    title: "Sold Qty",
+    value: totalQty,
+    icon: ShoppingCart,
+    color: "bg-violet-100",
+  },
+  {
+    title: "Total Customers",
+    value: totalCustomers,
+    icon: Users,
+    color: "bg-amber-100",
+  },
+  {
+    title: "Sales Return",
+    value: "₹0",
+    icon: RotateCcw,
+    color: "bg-rose-100",
+  },
+  {
+    title: "Total Products",
+    value: 56,
+    icon: Package,
+    color: "bg-cyan-100",
+  },
+  {
+    title: "Stock Qty",
+    value: 915,
+    icon: Boxes,
+    color: "bg-indigo-100",
+  },
+  {
+    title: "Cash in Hand",
+    value: "2.23L",
+    icon: Wallet,
+    color: "bg-lime-100",
+  },
+  {
+    title: "Bank Accounts",
+    value: 65279,
+    icon: CreditCard,
+    color: "bg-fuchsia-100",
+  },
+  {
+    title: "Gross Profit",
+    value: "₹0",
+    icon: TrendingUp,
+    color: "bg-teal-100",
+  },
+  {
+    title: "Avg. Profit Margin",
+    value: "0%",
+    icon: Percent,
+    color: "bg-orange-100",
+  },
+];
+
+
 
    const [startDate, setStartDate] = useState("2026-02-09");
   const [endDate, setEndDate] = useState("2026-02-15");
@@ -237,9 +381,251 @@ const ProductTable = ({ products }) => (
   ];
 
 return (
-  <div className="space-y-8">
+  <div className="space-y-8 mt-5">
 
-    {/* ================= PRODUCT SECTION ================= */}
+  <WaveGraphSection />
+
+  
+
+
+
+
+    {/* ================= GRAPH SECTION ================= */}
+  <div className="grid md:grid-cols-2 gap-6">
+
+  {/* 🔵 SALES VS PURCHASE (Keep As It Is) */}
+  <div className="bg-white p-5 shadow-md rounded-xl">
+    <div className="flex justify-between items-center mb-4">
+      <h2 className="font-bold text-gray-700">
+        Sales V/S Purchase
+      </h2>
+
+      <div className="flex gap-2 text-sm">
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="border border-gray-200 px-2 py-1 rounded"
+        />
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="border border-gray-200 px-2 py-1 rounded"
+        />
+      </div>
+    </div>
+
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={filteredSalesPurchase}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="label" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="sales" fill="#864396" />
+        <Bar dataKey="purchase" fill="#10b981" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+
+  {/* 🟣 RIGHT SIDE CARDS */}
+<div className="flex flex-col lg:flex-row gap-6">
+
+    {/* 🔥 Promotional Sales Card */}
+    <div className="bg-white p-5 shadow-md rounded-xl">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="font-bold text-gray-700">
+          Promotional Sales
+        </h2>
+        <select className="border border-gray-200 px-2 py-1 rounded text-sm">
+          <option>Weekly</option>
+          <option>Monthly</option>
+          <option>Yearly</option>
+        </select>
+      </div>
+
+      {/* Donut Chart */}
+      <div className="relative h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={[
+                { name: "Social Media", value: 400 },
+                { name: "Website", value: 300 },
+                { name: "Store", value: 300 },
+              ]}
+              innerRadius={70}
+              outerRadius={100}
+              paddingAngle={5}
+              dataKey="value"
+            >
+              <Cell fill="#f97316" />
+              <Cell fill="#3b82f6" />
+              <Cell fill="#8b5cf6" />
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+
+        {/* Center Text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <p className="text-gray-500 text-sm">Store</p>
+          <h3 className="text-xl font-bold">1,016</h3>
+          <p className="text-green-500 text-sm">+2.1%</p>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex justify-center gap-6 mt-4 text-sm">
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+          Social Media
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+          Website
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
+          Store
+        </div>
+      </div>
+    </div>
+
+    {/* 🏆 Top Sale Card */}
+    <div className="bg-white p-5 shadow-md rounded-xl">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="font-bold text-gray-700">
+          Top Sale
+        </h2>
+        <select className="border border-gray-200 px-2 py-1 rounded text-sm">
+          <option>Weekly</option>
+          <option>Monthly</option>
+          <option>Yearly</option>
+        </select>
+      </div>
+
+      <div className="space-y-4">
+        {[
+          {
+            name: "Neptune Longsleeve",
+            price: "$138",
+            sales: 952,
+            img: "https://i.pravatar.cc/50?img=1",
+          },
+          {
+            name: "Ribbed Tank Top",
+            price: "$108",
+            sales: 902,
+            img: "https://i.pravatar.cc/50?img=2",
+          },
+          {
+            name: "Oversized Motif T",
+            price: "$98",
+            sales: 882,
+            img: "https://i.pravatar.cc/50?img=3",
+          },
+        ].map((item, index) => (
+          <div
+            key={index}
+            className="flex justify-between items-center border-b pb-3"
+          >
+            <div className="flex items-center gap-3">
+              <img
+                src={item.img}
+                alt={item.name}
+                className="w-10 h-10 rounded object-cover"
+              />
+              <div>
+                <p className="font-medium text-sm">
+                  {item.name}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {item.price}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm font-semibold">
+              {item.sales} Sales
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</div>
+    
+
+    
+
+
+   <div className="p-6 border border-gray-300 rounded-lg bg-white shadow-md">
+      {/* Top Bar */}
+      <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+        {/* Date Filter */}
+        <div className="flex items-center gap-3">
+          <CalendarDays className="w-5 h-5 text-gray-600" />
+          <select
+            className="border px-3 py-2 rounded-lg text-sm"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="today">Today</option>
+            <option value="lastWeek">Last Week</option>
+            <option value="lastMonth">Last Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+
+          {filter === "custom" && (
+            <div className="flex gap-2">
+              <input
+                type="date"
+                className="border px-2 py-1 rounded"
+                value={customRange.start}
+                onChange={(e) =>
+                  setCustomRange({ ...customRange, start: e.target.value })
+                }
+              />
+              <input
+                type="date"
+                className="border px-2 py-1 rounded"
+                value={customRange.end}
+                onChange={(e) =>
+                  setCustomRange({ ...customRange, end: e.target.value })
+                }
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        {stats.map((item, index) => {
+          const Icon = item.icon;
+          return (
+            <div
+              key={index}
+              className={`p-5 rounded-2xl shadow-sm hover:shadow-md transition ${item.color}`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm text-gray-600">{item.title}</h3>
+                <Icon className="w-5 h-5 text-gray-700" />
+              </div>
+              <p className="text-2xl font-semibold text-gray-800">
+                {item.value}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+
+
+  {/* ================= PRODUCT SECTION ================= */}
     <div className="grid md:grid-cols-2 gap-6">
       {sections.map((section, i) => {
         const topProduct = section.products[0];
@@ -271,80 +657,11 @@ return (
       })}
     </div>
 
-    {/* ================= GRAPH SECTION ================= */}
-    <div className="grid md:grid-cols-2 gap-6">
-
-      {/* 🔵 SALES VS PURCHASE */}
-      <div className="bg-white p-5 shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-bold text-gray-700">
-            Sales V/S Purchase
-          </h2>
-
-          <div className="flex gap-2 text-sm mb-4">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="border border-gray-200 px-2 py-1"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="border border-gray-200 px-2 py-1"
-            />
-          </div>
-        </div>
-
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={filteredSalesPurchase}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="label" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="sales" fill="#864396" />
-            <Bar dataKey="purchase" fill="#10b981" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* 🟣 TRANSACTION */}
-      <div className="bg-white p-5 shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-bold text-gray-700">
-            Transaction
-          </h2>
-          <div className="flex gap-2 text-sm mb-4">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="border border-gray-200 px-2 py-1"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="border border-gray-200 px-2 py-1"
-            />
-          </div>
-        </div>
-
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={filteredTransaction}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="label" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="cash" fill="#d93030" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
 
   </div>
+
+
+
+
 );
 }
