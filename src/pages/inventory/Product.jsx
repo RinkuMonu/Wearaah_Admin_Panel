@@ -11,7 +11,7 @@ import {
   FileText
 } from "lucide-react";
 
-
+import CustomSelect from "../../components/CustomSelectDropdown";
 
 
 export default function ProductPage() {
@@ -191,6 +191,19 @@ export default function ProductPage() {
   }, []);
 
 
+  const [department, setDepartment] = useState("All");
+  const [category, setCategory] = useState("All");
+  const [subCategory, setSubCategory] = useState("All");
+const [brand, setBrand] = useState("All");
+const [subBrand, setSubBrand] = useState("All");
+const [hsn, setHsn] = useState("All");
+const [purchaseTax, setPurchaseTax] = useState("GST");
+const [salesTax, setSalesTax] = useState("GST");
+
+
+  const [fromMrp, setFromMrp] = useState("");
+const [toMrp, setToMrp] = useState("");
+
   return (
     <div className="p-6 min-h-screen">
       {/* HEADER */}
@@ -226,8 +239,6 @@ export default function ProductPage() {
               <option>200</option>
             </select>
 
-
-
             <div className="relative" ref={exportRef}>
               <button
                 onClick={() => setShowExport((prev) => !prev)}
@@ -261,10 +272,10 @@ export default function ProductPage() {
               )}
             </div>
 
-            <button className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68]  px-4 py-2 rounded-md text-sm">
+            {/* <button className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68]  px-4 py-2 rounded-md text-sm">
               <Filter size={16} />
               Filter
-            </button>
+            </button> */}
 
             <div className="relative">
               <Search
@@ -284,6 +295,98 @@ export default function ProductPage() {
             </button>
           </div>
         </div>
+
+        {/* FILTER SECTION */}
+        <div className="my-10 md:my-13">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+            <CustomSelect
+              label="Department"
+              options={["All", "Cloth", "Other"]}
+              value={department}
+              onChange={setDepartment}
+            />
+
+            <CustomSelect
+              label="Category"
+              options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
+              value={category}
+              onChange={setCategory}
+            />
+
+            <CustomSelect
+  label="Sub Category"
+  options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
+  value={subCategory}
+  onChange={setSubCategory}
+/>
+
+<CustomSelect
+  label="Brand"
+  options={["All", "Lionies", "Other"]}
+  value={brand}
+  onChange={setBrand}
+/>
+
+<CustomSelect
+  label="Sub Brand"
+  options={["All", "Lionies", "Other"]}
+  value={subBrand}
+  onChange={setSubBrand}
+/>
+
+<CustomSelect
+  label="HSN"
+  options={["All", "1234", "5678"]}
+  value={hsn}
+  onChange={setHsn}
+/>
+
+<CustomSelect
+  label="Purchase Tax"
+  options={["GST", "GST 0"]}
+  value={purchaseTax}
+  onChange={setPurchaseTax}
+/>
+
+<CustomSelect
+  label="Sales Tax"
+  options={["GST", "GST 0"]}
+  value={salesTax}
+  onChange={setSalesTax}
+/>
+            {/* From MRP */}
+<div>
+  <label className="block text-sm font-medium mb-1">
+    From MRP
+  </label>
+  <input
+    type="number"
+    value={fromMrp}
+    onChange={(e) => setFromMrp(e.target.value)}
+    placeholder="0"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+  />
+</div>
+
+{/* To MRP */}
+<div>
+  <label className="block text-sm font-medium mb-1">
+    To MRP
+  </label>
+  <input
+    type="number"
+    value={toMrp}
+    onChange={(e) => setToMrp(e.target.value)}
+    placeholder="0"
+    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+  />
+</div>
+          </div>
+        </div>
+
+
+
         {/* PRODUCT TABLE */}
         <div className="bg-white rounded-md shadow-sm overflow-hidden mt-5">
           <table className="w-full text-sm text-left">
