@@ -122,18 +122,18 @@ export default function StockPage() {
 
   const [showFilter, setShowFilter] = useState(false);
 
-    const [department, setDepartment] = useState("All");
+  const [department, setDepartment] = useState("All");
   const [category, setCategory] = useState("All");
   const [subCategory, setSubCategory] = useState("All");
-const [brand, setBrand] = useState("All");
-const [subBrand, setSubBrand] = useState("All");
-const [hsn, setHsn] = useState("All");
-const [purchaseTax, setPurchaseTax] = useState("GST");
-const [salesTax, setSalesTax] = useState("GST");
+  const [brand, setBrand] = useState("All");
+  const [subBrand, setSubBrand] = useState("All");
+  const [hsn, setHsn] = useState("All");
+  const [purchaseTax, setPurchaseTax] = useState("GST");
+  const [salesTax, setSalesTax] = useState("GST");
 
 
   const [fromMrp, setFromMrp] = useState("");
-const [toMrp, setToMrp] = useState("");
+  const [toMrp, setToMrp] = useState("");
 
   return (
     <div className="p-6 min-h-screen">
@@ -199,110 +199,109 @@ const [toMrp, setToMrp] = useState("");
                 </div>
               )}
             </div>
-          <button
-  onClick={() => setShowFilter((prev) => !prev)}
-  className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm"
->
-  <Filter size={16} />
-  Filter
-</button>
+            <button
+              onClick={() => setShowFilter((prev) => !prev)}
+              className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm"
+            >
+              <Filter size={16} />
+              Filter
+            </button>
           </div>
         </div>
         {/* FILTER SECTION */}
-<div
-  className={`overflow-hidden transition-all duration-1000 ease-in-out ${
-    showFilter ? "max-h-[1000px] opacity-100 mt-6" : "max-h-0 opacity-0"
-  }`}
->
-  <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div
+          className={`overflow-hidden transition-all duration-1000 ease-in-out ${showFilter ? "max-h-[1000px] opacity-100 mt-6" : "max-h-0 opacity-0"
+            }`}
+        >
+          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
-      <CustomSelect
-        label="Department"
-        options={["All", "Cloth", "Other"]}
-        value={department}
-        onChange={setDepartment}
-      />
+              <CustomSelect
+                label="Department"
+                options={["All", "Cloth", "Other"]}
+                value={department}
+                onChange={setDepartment}
+              />
 
-      <CustomSelect
-        label="Category"
-        options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
-        value={category}
-        onChange={setCategory}
-      />
+              <CustomSelect
+                label="Category"
+                options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
+                value={category}
+                onChange={setCategory}
+              />
 
-      <CustomSelect
-        label="Sub Category"
-        options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
-        value={subCategory}
-        onChange={setSubCategory}
-      />
+              <CustomSelect
+                label="Sub Category"
+                options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
+                value={subCategory}
+                onChange={setSubCategory}
+              />
 
-      <CustomSelect
-        label="Brand"
-        options={["All", "Lionies", "Other"]}
-        value={brand}
-        onChange={setBrand}
-      />
+              <CustomSelect
+                label="Brand"
+                options={["All", "Lionies", "Other"]}
+                value={brand}
+                onChange={setBrand}
+              />
 
-      <CustomSelect
-        label="Sub Brand"
-        options={["All", "Lionies", "Other"]}
-        value={subBrand}
-        onChange={setSubBrand}
-      />
+              <CustomSelect
+                label="Sub Brand"
+                options={["All", "Lionies", "Other"]}
+                value={subBrand}
+                onChange={setSubBrand}
+              />
 
-      <CustomSelect
-        label="HSN"
-        options={["All", "1234", "5678"]}
-        value={hsn}
-        onChange={setHsn}
-      />
+              <CustomSelect
+                label="HSN"
+                options={["All", "1234", "5678"]}
+                value={hsn}
+                onChange={setHsn}
+              />
 
-      <CustomSelect
-        label="Purchase Tax"
-        options={["GST", "GST 0"]}
-        value={purchaseTax}
-        onChange={setPurchaseTax}
-      />
+              <CustomSelect
+                label="Purchase Tax"
+                options={["GST", "GST 0"]}
+                value={purchaseTax}
+                onChange={setPurchaseTax}
+              />
 
-      <CustomSelect
-        label="Sales Tax"
-        options={["GST", "GST 0"]}
-        value={salesTax}
-        onChange={setSalesTax}
-      />
+              <CustomSelect
+                label="Sales Tax"
+                options={["GST", "GST 0"]}
+                value={salesTax}
+                onChange={setSalesTax}
+              />
 
-      {/* From MRP */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          From MRP
-        </label>
-        <input
-          type="number"
-          value={fromMrp}
-          onChange={(e) => setFromMrp(e.target.value)}
-          placeholder="0"
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-        />
-      </div>
+              {/* From MRP */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  From MRP
+                </label>
+                <input
+                  type="number"
+                  value={fromMrp}
+                  onChange={(e) => setFromMrp(e.target.value)}
+                  placeholder="0"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                />
+              </div>
 
-      {/* To MRP */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          To MRP
-        </label>
-        <input
-          type="number"
-          value={toMrp}
-          onChange={(e) => setToMrp(e.target.value)}
-          placeholder="0"
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-        />
-      </div>
-    </div>
-  </div>
-</div>
+              {/* To MRP */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  To MRP
+                </label>
+                <input
+                  type="number"
+                  value={toMrp}
+                  onChange={(e) => setToMrp(e.target.value)}
+                  placeholder="0"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
 
         {/* PRODUCT TABLE */}
@@ -350,8 +349,8 @@ const [toMrp, setToMrp] = useState("");
                   </td>
                   <td
                     className={`px-4 py-3 font-medium ${product.qty < 0
-                        ? "text-red-600"
-                        : "text-gray-800"
+                      ? "text-red-600"
+                      : "text-gray-800"
                       }`}
                   >
                     {product.qty.toFixed(2)}

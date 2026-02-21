@@ -10,7 +10,7 @@ export default function CategorySection() {
     const categories = [
         {
 
-  {
+  
             id: 1,
             img: "/image/shirt1.jpg",
             name: "t-shirt",
@@ -80,7 +80,7 @@ export default function CategorySection() {
             code: "SH001",
             description: "Casual wear",
         },
-]);
+];
   
 
     const [activeTab, setActiveTab] = useState("category");
