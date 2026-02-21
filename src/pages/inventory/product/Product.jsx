@@ -8,14 +8,13 @@ import {
   MoreVertical,
   FileDown,
   FileSpreadsheet,
-  FileText
+  FileText,
+  ScanLine
 } from "lucide-react";
-import { Link } from "lucide-react";
 
-import CustomSelect from "../../../components/CustomSelectDropdown";
+import CustomSelect from "../../../components/CustomSelectdropdown";
 
 export default function ProductPage() {
-
   const products = [
     {
       id: 1,
@@ -148,8 +147,6 @@ export default function ProductPage() {
       price: 1299,
       qty: 17,
     },
-
-
   ];
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -161,12 +158,8 @@ export default function ProductPage() {
 
   const totalPages = Math.ceil(products.length / rowsPerPage);
 
-
   const [showExport, setShowExport] = useState(false);
   const exportRef = useRef(null);
-
-
-
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -191,24 +184,23 @@ export default function ProductPage() {
   }, []);
 
 
+  const [showFilter, setShowFilter] = useState(false);
   const [department, setDepartment] = useState("All");
-  const [category, setCategory] = useState("All");
-  const [subCategory, setSubCategory] = useState("All");
-  const [brand, setBrand] = useState("All");
-  const [subBrand, setSubBrand] = useState("All");
-  const [hsn, setHsn] = useState("All");
-  const [purchaseTax, setPurchaseTax] = useState("GST");
-  const [salesTax, setSalesTax] = useState("GST");
-
-
-  const [fromMrp, setFromMrp] = useState("");
-  const [toMrp, setToMrp] = useState("");
+const [category, setCategory] = useState("All");
+const [subCategory, setSubCategory] = useState("All");
+const [brand, setBrand] = useState("All");
+const [subBrand, setSubBrand] = useState("All");
+const [hsn, setHsn] = useState("All");
+const [purchaseTax, setPurchaseTax] = useState("GST");
+const [salesTax, setSalesTax] = useState("GST");
+const [fromMrp, setFromMrp] = useState("");
+const [toMrp, setToMrp] = useState("");
 
   return (
     <div className="p-6 min-h-screen">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6 bg-[#f5efdd] p-3 rounded-md">
-        <h2 className="text-xl font-semibold">Product</h2>
+      <div className="flex justify-between items-center mb-6 bg-[#f5efdd] px-3 py-4 rounded-md">
+        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2"><ScanLine className="text-[#927f68]" />Product</h2>
 
         <button className="text-[#927f68] text-sm font-medium">
           Setup Opening Stock
@@ -272,10 +264,13 @@ export default function ProductPage() {
               )}
             </div>
 
-            {/* <button className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68]  px-4 py-2 rounded-md text-sm">
-              <Filter size={16} />
-              Filter
-            </button> */}
+        <button
+  onClick={() => setShowFilter((prev) => !prev)}
+  className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm"
+>
+  <Filter size={16} />
+  Filter
+</button>
 
             <div className="relative">
               <Search
@@ -289,104 +284,113 @@ export default function ProductPage() {
               />
             </div>
 
-            <Link to="/createnew" className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm">
+            <button className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm">
               <Plus size={16} />
               Create New
-            </Link>
-          </div>
-        </div>
-
-        {/* FILTER SECTION */}
-        <div className="my-10 md:my-13">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-
-            <CustomSelect
-              label="Department"
-              options={["All", "Cloth", "Other"]}
-              value={department}
-              onChange={setDepartment}
-            />
-
-            <CustomSelect
-              label="Category"
-              options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
-              value={category}
-              onChange={setCategory}
-            />
-
-            <CustomSelect
-              label="Sub Category"
-              options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
-              value={subCategory}
-              onChange={setSubCategory}
-            />
-
-            <CustomSelect
-              label="Brand"
-              options={["All", "Lionies", "Other"]}
-              value={brand}
-              onChange={setBrand}
-            />
-
-            <CustomSelect
-              label="Sub Brand"
-              options={["All", "Lionies", "Other"]}
-              value={subBrand}
-              onChange={setSubBrand}
-            />
-
-            <CustomSelect
-              label="HSN"
-              options={["All", "1234", "5678"]}
-              value={hsn}
-              onChange={setHsn}
-            />
-
-            <CustomSelect
-              label="Purchase Tax"
-              options={["GST", "GST 0"]}
-              value={purchaseTax}
-              onChange={setPurchaseTax}
-            />
-
-            <CustomSelect
-              label="Sales Tax"
-              options={["GST", "GST 0"]}
-              value={salesTax}
-              onChange={setSalesTax}
-            />
-            {/* From MRP */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                From MRP
-              </label>
-              <input
-                type="number"
-                value={fromMrp}
-                onChange={(e) => setFromMrp(e.target.value)}
-                placeholder="0"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-              />
-            </div>
-
-            {/* To MRP */}
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                To MRP
-              </label>
-              <input
-                type="number"
-                value={toMrp}
-                onChange={(e) => setToMrp(e.target.value)}
-                placeholder="0"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-              />
-            </div>
+            </button>
           </div>
         </div>
 
 
 
+        <div
+  className={`transition-all duration-300 ease-in-out overflow-hidden ${
+    showFilter ? "max-h-[1000px] opacity-100 mt-6" : "max-h-0 opacity-0"
+  }`}
+>
+  <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+      {/* Your CustomSelect Components Here */}
+      
+      <CustomSelect
+        label="Department"
+        options={["All", "Cloth", "Other"]}
+        value={department}
+        onChange={setDepartment}
+      />
+
+      <CustomSelect
+        label="Category"
+        options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
+        value={category}
+        onChange={setCategory}
+      />
+
+      <CustomSelect
+        label="Sub Category"
+        options={["All", "Bootcut Jeans", "Formal Pant", "Trousers"]}
+        value={subCategory}
+        onChange={setSubCategory}
+      />
+
+      <CustomSelect
+        label="Brand"
+        options={["All", "Lionies", "Other"]}
+        value={brand}
+        onChange={setBrand}
+      />
+
+      <CustomSelect
+        label="Sub Brand"
+        options={["All", "Lionies", "Other"]}
+        value={subBrand}
+        onChange={setSubBrand}
+      />
+
+      <CustomSelect
+        label="HSN"
+        options={["All", "1234", "5678"]}
+        value={hsn}
+        onChange={setHsn}
+      />
+
+      <CustomSelect
+        label="Purchase Tax"
+        options={["GST", "GST 0"]}
+        value={purchaseTax}
+        onChange={setPurchaseTax}
+      />
+
+      <CustomSelect
+        label="Sales Tax"
+        options={["GST", "GST 0"]}
+        value={salesTax}
+        onChange={setSalesTax}
+      />
+
+      {/* From MRP */}
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          From MRP
+        </label>
+        <input
+          type="number"
+          value={fromMrp}
+          onChange={(e) => setFromMrp(e.target.value)}
+          placeholder="0"
+          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+        />
+      </div>
+
+      {/* To MRP */}
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          To MRP
+        </label>
+        <input
+          type="number"
+          value={toMrp}
+          onChange={(e) => setToMrp(e.target.value)}
+          placeholder="0"
+          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+        
         {/* PRODUCT TABLE */}
         <div className="bg-white rounded-md shadow-sm overflow-hidden mt-5">
           <table className="w-full text-sm text-left">
@@ -411,30 +415,19 @@ export default function ProductPage() {
                   key={index}
                   className="border-t border-gray-200 hover:bg-gray-50 transition"
                 >
-                  <td className="px-4 py-3">
-                    {indexOfFirstRow + index + 1}
-                  </td>
+                  <td className="px-4 py-3">{indexOfFirstRow + index + 1}</td>
                   <td className="px-4 py-3">{product.code}</td>
-                  <td className="px-4 py-3 capitalize">
-                    {product.category}
-                  </td>
-                  <td className="px-4 py-3">
-                    {product.brand}
-                  </td>
+                  <td className="px-4 py-3 capitalize">{product.category}</td>
+                  <td className="px-4 py-3">{product.brand}</td>
                   <td className="px-4 py-3 text-blue-600 font-medium">
                     {product.name}
                   </td>
-                  <td className="px-4 py-3">
-                    ₹{product.mrp.toFixed(2)}
-                  </td>
-                  <td className="px-4 py-3">
-                    ₹{product.price.toFixed(2)}
-                  </td>
+                  <td className="px-4 py-3">₹{product.mrp.toFixed(2)}</td>
+                  <td className="px-4 py-3">₹{product.price.toFixed(2)}</td>
                   <td
-                    className={`px-4 py-3 font-medium ${product.qty < 0
-                      ? "text-red-600"
-                      : "text-gray-800"
-                      }`}
+                    className={`px-4 py-3 font-medium ${
+                      product.qty < 0 ? "text-red-600" : "text-gray-800"
+                    }`}
                   >
                     {product.qty.toFixed(2)}
                   </td>
@@ -452,7 +445,6 @@ export default function ProductPage() {
               ))}
             </tbody>
           </table>
-
 
           {/* Pagination */}
           <div className="flex justify-between items-center px-4 py-3 border-t bg-white">

@@ -14,3 +14,14 @@
 .animate-fadeIn {
   animation: fadeIn 0.15s ease-out;
 }
+
+.label-style {
+  @apply block text-sm font-medium text-[#5c5042] mb-1;
+}
+
+.input-style {
+  @apply w-full bg-white border border-[#d6cbb5] rounded-md px-4 py-2 
+  focus:outline-none focus:ring-2 focus:ring-[#927f68] 
+  focus:border-[#927f68] transition;
+}
+

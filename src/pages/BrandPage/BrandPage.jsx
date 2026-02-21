@@ -3,6 +3,7 @@ import api from "../../serviceAuth/axios";
 import Swal from "sweetalert2";
 import CreateBrandModal from "./CreateBrandModal";
 import EditBrandModal from "./EditBrandModal";
+import { Pencil, Search, Tag } from "lucide-react";
 
 export default function BrandPage() {
   const [brands, setBrands] = useState([]);
@@ -61,43 +62,67 @@ export default function BrandPage() {
 
   return (
     <div className="p-6 overflow-hidden">
-      {/* HEADER */}
-      <div className="flex justify-between mb-4">
-        <div className="flex gap-4">
+      <div className="flex justify-between items-center mb-6 bg-[#f5efdd] p-3 rounded-md">
+        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2"><Tag className="text-[#927f68]" />Brand</h2>
+
+        <button className="text-[#927f68] text-sm font-medium">
+         <div className="flex gap-4">
           {/* SEARCH */}
-          <input
-            type="text"
-            placeholder="Search brand..."
-            className="border px-3 py-2 rounded-lg w-64"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        
+         <div className="relative w-64">
+  {/* Icon */}
+  <Search
+    size={18}
+    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#927f68]"
+  />
+
+  {/* Input */}
+  <input
+    type="text"
+    placeholder="Search brand..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="w-full pl-10 pr-4 py-2 rounded-md 
+               border border-[#d6cbb5] 
+               bg-[#f5efdd] 
+               focus:outline-none 
+               focus:ring-2 focus:ring-[#927f68] 
+               focus:border-[#927f68] 
+               transition"
+  />
+</div>
 
           {/* CREATE BUTTON */}
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-[#927f68] text-[#f5efdd] px-4 py-2 rounded-md hover:bg-[#baa48a] transition-colors"
           >
             + Create Brand
           </button>
         </div>
+        </button>
+         <div className="flex justify-between">
+        
 
         {/* LIMIT */}
         <select
           value={limit}
           onChange={(e) => setLimit(Number(e.target.value))}
-          className="border px-3 py-2 rounded-lg cursor-pointer"
+          className="border border-gray-200 px-3 py-2 rounded-lg cursor-pointer"
         >
           <option value={5}>5</option>
           <option value={10}>10</option>
           <option value={20}>20</option>
         </select>
       </div>
+      </div>
+      {/* HEADER */}
+     
 
       {/* TABLE */}
       <div className="bg-white rounded-xl shadow overflow-x-scroll">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100">
+          <thead className="bg-[#927f68] text-[#f5efdd]">
             <tr>
               <th className="p-3">Logo</th>
               <th className="p-3">Brand</th>
@@ -133,7 +158,7 @@ export default function BrandPage() {
                     <img
                       src={`${BASE_URL}/${b.logo}`}
                       alt={b.name}
-                      className="w-12 h-12 rounded object-cover border"
+                      className="w-12 h-12 rounded object-cover"
                     />
                   </td>
 
@@ -176,11 +201,11 @@ export default function BrandPage() {
 
                   <td className="p-3">
                     <button
-                      onClick={() => handleEdit(b)}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                      Edit
-                    </button>
+  onClick={() => handleEdit(b)}
+  className="text-[#927f68] hover:text-[#5c5042] hover:bg-[#f5efdd] p-2  rounded-md transition"
+>
+  <Pencil size={16} />
+</button>
                   </td>
                 </tr>
               ))

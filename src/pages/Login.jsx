@@ -238,7 +238,7 @@ export default function LoginPage() {
                       type="button"
                       disabled={isotpsend}
                       onClick={handleSendOtp}
-                      className={`px-4 py-2 rounded-md cursor-pointer ${
+                      className={`px-4 py-2 rounded-md cursor-pointer border border-gray-100 hover:text-gray-700 hover:bg-gray-100 ${
                         (useOtp ? "bg-[#927f68]" : "bg-gray-600",
                         isotpsend ? "opacity-50 cursor-not-allowed" : "")
                       }`}
@@ -321,7 +321,7 @@ export default function LoginPage() {
                   (!validateEmail(email) && loginMethod === "email") ||
                   (!validateMobile(mobile) && loginMethod === "mobile")
                 }
-                className={`w-full bg-[#927f68] hover:bg-[#774b52] py-2 rounded-md font-medium mt-4 ${
+                className={`w-full bg-[#927f68] hover:bg-[#625646] py-2 rounded-md font-medium mt-4 ${
                   isloading
                     ? "opacity-50 cursor-not-allowed"
                     : !validateEmail(email) && loginMethod === "email"

@@ -129,214 +129,201 @@ export default function EditBrandModal({ data, onClose, refresh }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Edit Brand</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
-          >
-            &times;
-          </button>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+  <div className="bg-white w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl border border-[#e6dcc7] p-8">
+
+    {/* Header */}
+    <div className="flex justify-between items-center mb-6 border-b border-[#e6dcc7] pb-4">
+      <h2 className="text-2xl font-semibold text-[#5c5042]">
+        Edit Brand
+      </h2>
+      <button
+        onClick={onClose}
+        className="text-[#927f68] hover:text-[#5c5042] text-2xl transition"
+      >
+        &times;
+      </button>
+    </div>
+
+    <div className="grid grid-cols-2 gap-5">
+
+      {/* Brand Name */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">Brand Name *</label>
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleInputChange}
+          placeholder="Enter brand name"
+          className="input-style"
+        />
+      </div>
+
+      {/* Brand Type */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">Brand Type *</label>
+        <select
+          name="brandType"
+          value={form.brandType}
+          onChange={handleInputChange}
+          className="input-style"
+        >
+          <option value="">Select Type</option>
+          {brandTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Tagline */}
+      <div className="col-span-2">
+        <label className="label-style">Tagline *</label>
+        <input
+          name="tagline"
+          value={form.tagline}
+          onChange={handleInputChange}
+          placeholder="Enter brand tagline"
+          className="input-style"
+        />
+      </div>
+
+      {/* Description */}
+      <div className="col-span-2">
+        <label className="label-style">Description *</label>
+        <textarea
+          name="description"
+          value={form.description}
+          onChange={handleInputChange}
+          placeholder="Enter brand description"
+          rows="3"
+          className="input-style resize-none"
+        />
+      </div>
+
+      {/* GST */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">GST Number *</label>
+        <input
+          name="gstNumber"
+          value={form.gstNumber}
+          onChange={handleInputChange}
+          placeholder="Enter GST number"
+          className="input-style"
+        />
+      </div>
+
+      {/* Country */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">Country of Origin</label>
+        <input
+          name="countryOfOrigin"
+          value={form.countryOfOrigin}
+          onChange={handleInputChange}
+          placeholder="Enter country"
+          className="input-style"
+        />
+      </div>
+
+      {/* Support Email */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">Support Email *</label>
+        <input
+          type="email"
+          name="supportEmail"
+          value={form.supportEmail}
+          onChange={handleInputChange}
+          placeholder="Enter support email"
+          className="input-style"
+        />
+      </div>
+
+      {/* Support Phone */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">Support Phone *</label>
+        <input
+          name="supportPhone"
+          value={form.supportPhone}
+          onChange={handleInputChange}
+          placeholder="Enter support phone"
+          className="input-style"
+        />
+      </div>
+
+      {/* Website */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">Website</label>
+        <input
+          name="websiteUrl"
+          value={form.websiteUrl}
+          onChange={handleInputChange}
+          placeholder="Enter website URL"
+          className="input-style"
+        />
+      </div>
+
+      {/* Established Year */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="label-style">Established Year</label>
+        <input
+          type="number"
+          name="establishedYear"
+          value={form.establishedYear}
+          onChange={handleInputChange}
+          placeholder="Enter year"
+          min="1800"
+          max={new Date().getFullYear()}
+          className="input-style"
+        />
+      </div>
+
+      {/* Logo Upload */}
+      <div className="col-span-2">
+        <label className="label-style">
+          Brand Logo {!logo && "(Current logo will be kept if not changed)"}
+        </label>
+
+        <div className="flex items-center gap-4 bg-white border border-dashed border-[#cbbca5] rounded-xl p-4">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="text-sm text-[#5c5042]"
+          />
+
+          <img
+            src={previewUrl || `${BASE_URL}/${data.logo}`}
+            alt="Brand"
+            className="w-16 h-16 object-cover"
+          />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          {/* Brand Name */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Brand Name *
-            </label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleInputChange}
-              placeholder="Enter brand name"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Brand Type */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Brand Type *
-            </label>
-            <select
-              name="brandType"
-              value={form.brandType}
-              onChange={handleInputChange}
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Type</option>
-              {brandTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Tagline */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tagline *
-            </label>
-            <input
-              name="tagline"
-              value={form.tagline}
-              onChange={handleInputChange}
-              placeholder="Enter brand tagline"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Description */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description *
-            </label>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleInputChange}
-              placeholder="Enter brand description"
-              rows="3"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* GST Number */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              GST Number *
-            </label>
-            <input
-              name="gstNumber"
-              value={form.gstNumber}
-              onChange={handleInputChange}
-              placeholder="Enter GST number"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Country of Origin */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Country of Origin
-            </label>
-            <input
-              name="countryOfOrigin"
-              value={form.countryOfOrigin}
-              onChange={handleInputChange}
-              placeholder="Enter country"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Support Email */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Support Email *
-            </label>
-            <input
-              name="supportEmail"
-              type="email"
-              value={form.supportEmail}
-              onChange={handleInputChange}
-              placeholder="Enter support email"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Support Phone */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Support Phone *
-            </label>
-            <input
-              name="supportPhone"
-              value={form.supportPhone}
-              onChange={handleInputChange}
-              placeholder="Enter support phone"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Website */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Website
-            </label>
-            <input
-              name="websiteUrl"
-              value={form.websiteUrl}
-              onChange={handleInputChange}
-              placeholder="Enter website URL"
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Established Year */}
-          <div className="col-span-2 sm:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Established Year
-            </label>
-            <input
-              name="establishedYear"
-              type="number"
-              value={form.establishedYear}
-              onChange={handleInputChange}
-              placeholder="Enter year"
-              min="1800"
-              max={new Date().getFullYear()}
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Logo Upload */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Brand Logo {!logo && "(Current logo will be kept if not changed)"}
-            </label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <div className="relative">
-                <img
-                  src={previewUrl || `${BASE_URL}/${data.logo}`}
-                  alt="Brand"
-                  className="w-16 h-16 object-cover rounded-lg border"
-                />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Supported formats: JPG, PNG, GIF (Max size: 5MB)
-            </p>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-3 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
-            disabled={loading}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={update}
-            disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Updating..." : "Update Brand"}
-          </button>
-        </div>
+        <p className="text-xs text-[#8b7a63] mt-2">
+          Supported formats: JPG, PNG, GIF (Max size: 5MB)
+        </p>
       </div>
     </div>
+
+    {/* Buttons */}
+    <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-[#e6dcc7]">
+      <button
+        onClick={onClose}
+        disabled={loading}
+        className="px-5 py-2 rounded-md border border-[#927f68] text-[#927f68] hover:bg-[#927f68] hover:text-white transition"
+      >
+        Cancel
+      </button>
+
+      <button
+        onClick={update}
+        disabled={loading}
+        className="px-6 py-2 rounded-md bg-[#927f68] text-white hover:bg-[#7b6b57] transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? "Updating..." : "Update Brand"}
+      </button>
+    </div>
+  </div>
+</div>
   );
 }

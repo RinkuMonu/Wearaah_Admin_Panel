@@ -229,7 +229,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
               Category Name <span className="text-red-500">*</span>
             </label>
             <input
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#927f68] focus:border-[#927f68] transition-all ${
                 errors.name ? "border-red-500 bg-red-50" : "border-gray-300"
               }`}
               placeholder="e.g., Electronics, Fashion, Furniture"
@@ -263,7 +263,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
               Description
             </label>
             <textarea
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#927f68] focus:border-[#927f68] transition-all resize-none"
               placeholder="Enter category description (optional)"
               rows="3"
               value={description}
@@ -281,7 +281,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
             </label>
             <input
               type="number"
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#927f68] focus:border-[#927f68] transition-all ${
                 errors.displayOrder
                   ? "border-red-500 bg-red-50"
                   : "border-gray-300"
@@ -355,7 +355,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
                   className={`border-2 border-dashed rounded-xl p-4 text-center ${
                     smallImagePreview
                       ? "border-green-300 bg-green-50"
-                      : "border-gray-300 hover:border-blue-400"
+                      : "border-gray-300 hover:border-[#927f68]"
                   } transition-colors`}
                 >
                   {smallImagePreview ? (
@@ -411,7 +411,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
-                        <span className="text-blue-600 font-medium">
+                        <span className="text-[#927f68] font-medium">
                           Click to upload
                         </span>
                         <p className="text-xs text-gray-500 mt-1">
@@ -432,7 +432,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
                   className={`border-2 border-dashed rounded-xl p-4 text-center ${
                     bannerImagePreview
                       ? "border-green-300 bg-green-50"
-                      : "border-gray-300 hover:border-blue-400"
+                      : "border-gray-300 hover:border-[#927f68]"
                   } transition-colors`}
                 >
                   {bannerImagePreview ? (
@@ -488,7 +488,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
-                        <span className="text-blue-600 font-medium">
+                        <span className="text-[#927f68] font-medium">
                           Click to upload
                         </span>
                         <p className="text-xs text-gray-500 mt-1">
@@ -515,7 +515,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-8 py-3 bg-[#927f68] text-white rounded-xl hover:bg-[#7a6c5a] transition-all font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading ? (
               <>

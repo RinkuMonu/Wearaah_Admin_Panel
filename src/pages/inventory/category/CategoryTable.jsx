@@ -86,7 +86,7 @@ export default function CategoryTable() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-800">Categories</h2>
-          <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">
+          <span className="px-2 py-1 text-xs font-medium bg-[#f5efdd] text-[#927f68] rounded-full">
             {filteredData.length} Total
           </span>
         </div>
@@ -96,7 +96,7 @@ export default function CategoryTable() {
             setOpen(true);
             setEditData(null);
           }}
-          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2"
+          className="px-4 py-2 bg-[#927f68] text-[#f5efdd] hover:bg-white hover:text-[#927f68] rounded-md transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2"
         >
           <svg
             className="w-5 h-5"
@@ -135,7 +135,7 @@ export default function CategoryTable() {
           placeholder="Search categories..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#927f68] focus:border-transparent transition-all"
         />
       </div>
 
@@ -194,9 +194,9 @@ export default function CategoryTable() {
           </div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-[#927f68]  border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <svg
                       className="w-4 h-4"
@@ -214,10 +214,10 @@ export default function CategoryTable() {
                     Category Name
                   </div>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   <div className="flex items-center gap-2">Description</div>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <svg
                       className="w-4 h-4"
@@ -235,13 +235,13 @@ export default function CategoryTable() {
                     Created
                   </div>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   Banner
                 </th>
-                <th className="px-6 py-4 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-start text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -264,7 +264,7 @@ export default function CategoryTable() {
                         <p className="text-sm font-medium text-gray-900">
                           {item.name}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs text-[#f5efdd] mt-0.5">
                           DisplayOrder {item.displayOrder}
                         </p>
                       </div>
@@ -281,10 +281,10 @@ export default function CategoryTable() {
                     <div className="text-sm text-gray-600">
                       {item.createdAt
                         ? new Date(item.createdAt).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
                         : "N/A"}
                     </div>
                     <div className="text-xs text-gray-400">
@@ -301,7 +301,7 @@ export default function CategoryTable() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="w-full h-full  rounded-lg flex ">
+                    <div className="w-full h-full rounded-lg flex ">
                       <img
                         src={`${BASE_URL}${item.bannerimage}`}
                         className="w-50 h-22"
