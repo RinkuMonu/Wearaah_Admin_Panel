@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { Pencil, Trash2, UploadCloud, ImageIcon } from "lucide-react";
 
-export default function CategoryBrandSection() {
+export default function CategorySection() {
     const categories = [
         {
             id: 1,
@@ -97,7 +97,7 @@ export default function CategoryBrandSection() {
         <div className="p-6 min-h-screen">
             {/* HEADER */}
             <div className="flex justify-between items-center mb-6 bg-[#f5efdd] p-3 rounded-md">
-                <h2 className="text-xl font-semibold">Category/Brand</h2>
+                <h2 className="text-xl font-semibold">Category</h2>
             </div>
 
             {/* ACTION BAR */}

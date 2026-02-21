@@ -1,81 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Boxes,
-  Users,
-  Truck,
-  MessageSquare,
-  ChevronDown,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { useAuth } from "../serviceAuth/context";
+import { menuItems } from "./sidebarMenu";
 
 export default function Sidebar({ isOpen }) {
+  const { user } = useAuth();
   const [openMenu, setOpenMenu] = useState(null);
 
-  const menuItems = [
-    { name: "Dashboard", path: "/", icon: LayoutDashboard },
-    {
-      name: "Inventory",
-      icon: Boxes,
-      submenu: [
-        { name: "All Products", path: "/Product" },
-        { name: "Stock", path: "/stock" },
-        { name: "Category/Brand", path: "/category" },
-      ],
-    },
-    { name: "Employee", path: "/employee", icon: Users },
-    {
-      name: "Purchase",
-      icon: Truck,
-      submenu: [
-        { name: "All Purchases", path: "/purchase" },
-        { name: "Add Purchase", path: "/purchase/add" },
-        { name: "Vendors", path: "/purchase/vendors" },
-      ],
-    },
-    { name: "Contact", path: "/contact", icon: MessageSquare },
-  ];
+  useEffect(() => {
+    setOpenMenu(null);
+  }, [user?.user?.role]);
+
+  // ✅ ROLE BASED FILTER
+  const filteredMenu = menuItems
+    .filter((item) => item.roles.includes(user?.user?.role))
+    .map((item) => {
+      if (item.submenu) {
+        const filteredSub = item.submenu.filter((sub) =>
+          sub.roles.includes(user?.user?.role),
+        );
+
+        // ❌ agar submenu empty → item hide
+        if (filteredSub.length === 0) return null;
+
+        return { ...item, submenu: filteredSub };
+      }
+      return item;
+    })
+    .filter(Boolean);
 
   return (
     <aside
-      className={`
-        fixed top-13 left-0 h-screen bg-black text-gray-300
-        transition-all duration-300 z-50
-        ${isOpen ? "w-64" : "w-0"}
-        overflow-hidden
-      `}
+      className={`fixed top-13 left-0 h-screen bg-black text-gray-300
+      transition-all duration-300 z-50
+      ${isOpen ? "w-64" : "w-0"} overflow-hidden`}
     >
       <div className="p-4">
         <nav className="space-y-2 mt-6">
-          {menuItems.map((item, index) => {
+          {/* ✅ USE filteredMenu HERE */}
+          {filteredMenu.map((item, index) => {
             const Icon = item.icon;
             const isDropdown = item.submenu;
 
             return (
               <div key={index}>
-                {/* Main Menu Item */}
                 {isDropdown ? (
                   <div
                     onClick={() =>
-                      setOpenMenu(
-                        openMenu === item.name ? null : item.name
-                      )
+                      setOpenMenu(openMenu === item.name ? null : item.name)
                     }
-                    className="flex items-center justify-between px-4 py-2 rounded-md cursor-pointer hover:bg-[#998f72] hover:text-white transition-all"
+                    className="flex items-center justify-between px-4 py-2 rounded-md cursor-pointer hover:bg-[#998f72] hover:text-white"
                   >
                     <div className="flex items-center gap-3">
                       <Icon size={18} />
-                      <span className="text-sm font-medium">
-                        {item.name}
-                      </span>
+                      <span className="text-sm font-medium">{item.name}</span>
                     </div>
 
                     <ChevronDown
                       size={16}
-                      className={`transition-transform duration-300 ${
-                        openMenu === item.name
-                          ? "rotate-180"
-                          : ""
+                      className={`transition-transform ${
+                        openMenu === item.name ? "rotate-180" : ""
                       }`}
                     />
                   </div>
@@ -83,7 +68,7 @@ export default function Sidebar({ isOpen }) {
                   <NavLink
                     to={item.path}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200
+                      `flex items-center gap-3 px-4 py-2 rounded-md
                       ${
                         isActive
                           ? "bg-[#f5efdd] text-black"
@@ -92,13 +77,11 @@ export default function Sidebar({ isOpen }) {
                     }
                   >
                     <Icon size={18} />
-                    <span className="text-sm font-medium">
-                      {item.name}
-                    </span>
+                    <span className="text-sm font-medium">{item.name}</span>
                   </NavLink>
                 )}
 
-                {/* Submenu */}
+                {/* SUBMENU */}
                 {isDropdown && openMenu === item.name && (
                   <div className="ml-8 mt-2 space-y-1">
                     {item.submenu.map((subItem, subIndex) => (
@@ -106,7 +89,7 @@ export default function Sidebar({ isOpen }) {
                         key={subIndex}
                         to={subItem.path}
                         className={({ isActive }) =>
-                          `block px-3 py-1 text-sm rounded-md transition-all
+                          `block px-3 py-1 text-sm rounded-md
                           ${
                             isActive
                               ? "bg-[#f5efdd] text-black"
