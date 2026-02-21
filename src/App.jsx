@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
 import Dashboard from "./pages/dashboard";
-import ProductPage from "./pages/inventory/Product";
+import ProductPage from "./pages/inventory/product/Product";
 import StockPage from "./pages/inventory/Stock";
 import CategoryBrandSection from "./pages/inventory/Category&Brand";
 import ProfilePage from "./pages/Profile";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
+import NewProductPage from "./pages/inventory/product/CreateNew";
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
           <Route path="stock" element={<StockPage />} />
           <Route path="category" element={<CategoryBrandSection />} />
           <Route path="profile" element={<ProfilePage/>} />
+          <Route path="createnew" element={<NewProductPage />} />
+
         
 
 

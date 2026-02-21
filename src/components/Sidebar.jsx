@@ -28,7 +28,7 @@ export default function Sidebar({ isOpen }) {
       name: "Purchase",
       icon: Truck,
       submenu: [
-        { name: "All Purchases", path: "/purchase" },
+        { name: "Purchase Order", path: "/purchase" },
         { name: "Add Purchase", path: "/purchase/add" },
         { name: "Vendors", path: "/purchase/vendors" },
       ],
