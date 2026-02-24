@@ -12,6 +12,7 @@ import Unauthorized from "./pages/unauthorized";
 import { RoleProtectedRoute } from "./serviceAuth/roleAuthChecking";
 import CategoryPage from "./pages/inventory/category/CategoryPage";
 import BrandPage from "./pages/BrandPage/BrandPage";
+import ContactPage from "./pages/ContactPage/ContactPage";
 import SubCategoryPage from "./pages/inventory/subcategory/subcategoryPage";
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
               <Route path="product" element={<ProductPage />} />
               <Route path="stock" element={<StockPage />} />
               <Route path="brand" element={<BrandPage />} />
+              <Route path="contact" element={<ContactPage />} />
             </Route>
           </Route>
         </Route>
