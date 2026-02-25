@@ -19,8 +19,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />

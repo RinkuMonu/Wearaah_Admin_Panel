@@ -49,7 +49,8 @@ export const SubCategoryTable = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await api.delete(`/categories/${id}`);
+      const resss = await api.delete(`/subcategory/${id}`);
+      console.log(resss);
       Swal.fire({
         icon: "success",
         title: "Deleted!",
@@ -289,7 +290,11 @@ export const SubCategoryTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                        {item.name?.charAt(0).toUpperCase()}
+                        {/* {item.name?.charAt(0).toUpperCase()} */}
+                        <img
+                          src={`${import.meta.env.VITE_BASE_URL}${item.smallimage}`}
+                          className="h-10 w-full mb-2 rounded"
+                        />
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
@@ -407,15 +412,37 @@ export const SubCategoryTable = () => {
 
       {/* Modal */}
       {open && (
-        <SubCategoryModal
-          editData={editData}
-          onClose={() => {
-            setOpen(false);
-            setEditData(null);
-          }}
-          refresh={fetchData}
-          type="subcategory"
-        />
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl animate-fadeIn mt-10">
+            {/* MODAL HEADER */}
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h2 className="text-lg font-semibold">
+                {editData ? "Edit Subcategory" : "Create Subcategory"}
+              </h2>
+
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  setEditData(null);
+                }}
+                className="text-gray-500 hover:text-red-500 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* MODAL BODY */}
+            <div className="p-6 max-h-[80vh] overflow-y-auto">
+              <SubCategoryModal
+                editData={editData}
+                onSuccess={() => {
+                  fetchData();
+                  setOpen(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
