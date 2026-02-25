@@ -2,233 +2,364 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import api from "../../../serviceAuth/axios";
 
-export const SubCategoryModal = ({ onClose, refresh, editData }) => {
+export const SubCategoryModal = ({ onSuccess, editData }) => {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     categoryId: "",
     sizeType: "alpha",
   });
 
-  const [attributes, setAttributes] = useState([]);
   const [variantAttributes, setVariantAttributes] = useState([]);
-  const [smallimage, setSmallImage] = useState(null);
-  const [bannerimage, setBannerImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  console.log(variantAttributes);
+  const [variantInput, setVariantInput] = useState("");
 
-  // 📦 Fetch parent categories
+  const [attributes, setAttributes] = useState([]);
+  const [images, setImages] = useState({});
+
+  /* ---------------- FETCH CATEGORIES ---------------- */
+
+  const fetchCategories = async () => {
+    const { data } = await api.get("/category");
+    setCategories(data.categories || []);
+  };
+
   useEffect(() => {
-    api.get("/category").then((res) => setCategories(res.data.categories));
+    fetchCategories();
   }, []);
 
-  // ✏️ Edit mode
   useEffect(() => {
     if (editData) {
-      setForm(editData);
-      setAttributes(
-        Object.entries(editData.attributes || {}).map(([k, v]) => ({
-          name: k,
-          values: v.values.join(","),
-          required: v.required,
-          filterable: v.filterable,
-        })),
-      );
+      setForm({
+        name: editData.name || "",
+        categoryId: editData.categoryId?._id || "",
+        sizeType: editData.sizeType || "alpha",
+      });
+
+      // ✅ VARIANT ATTRIBUTES
       setVariantAttributes(editData.variantAttributes || []);
+
+      // ✅ ATTRIBUTES
+      if (editData.attributes) {
+        const formatted = Object.entries(editData.attributes).map(
+          ([key, value]) => ({
+            key,
+            values: value.values.join(", "),
+            required: value.required || false,
+            filterable: value.filterable || false,
+          }),
+        );
+
+        setAttributes(formatted);
+      }
+
+      // ✅ IMAGES PREVIEW
+      setImages({
+        smallimagePreview: editData.smallimage || null,
+        bannerimagePreview: editData.bannerimage || null,
+      });
     }
   }, [editData]);
+  /* ---------------- VARIANT ATTRIBUTES ---------------- */
 
-  // ➕ Add attribute row
+  // const addVariantAttribute = () => {
+  //   const value = variantInput.trim().toLowerCase();
+
+  //   if (!value) return;
+
+  //   if (variantAttributes.includes(value)) {
+  //     return Swal.fire({
+  //       icon: "info",
+  //       title: "Duplicate",
+  //       text: "Variant attribute already added",
+  //       timer: 1200,
+  //       showConfirmButton: false,
+  //     });
+  //   }
+
+  //   setVariantAttributes([...variantAttributes, value]);
+  //   setVariantInput("");
+  // };
+
+  /* ---------------- ATTRIBUTES BUILDER ---------------- */
+
   const addAttribute = () => {
     setAttributes([
       ...attributes,
-      { name: "", values: "", required: false, filterable: false },
+      { key: "", values: "", required: false, filterable: false },
     ]);
   };
 
-  // ❌ Remove attribute
-  const removeAttribute = (index) => {
-    setAttributes(attributes.filter((_, i) => i !== index));
+  const handleAttributeChange = (index, field, value) => {
+    const updated = [...attributes];
+    updated[index][field] = value;
+    setAttributes(updated);
   };
 
-  // 💾 Submit
-  const handleSubmit = async () => {
+  /* ---------------- SUBMIT ---------------- */
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
       setLoading(true);
 
-      const attrObj = {};
+      const formData = new FormData();
+
+      // if (variantAttributes.length === 0) {
+      //   return Swal.fire("Add at least one variant attribute");
+      // }
+      formData.append("name", form.name);
+      formData.append("categoryId", form.categoryId);
+      formData.append("sizeType", form.sizeType);
+
+      /* VARIANT ATTRIBUTES */
+      formData.append("variantAttributes", JSON.stringify(variantAttributes));
+
+      /* ATTRIBUTES JSON */
+      const formattedAttributes = {};
+
       attributes.forEach((attr) => {
-        attrObj[attr.name] = {
-          values: attr.values.split(","),
+        if (!attr.key) return;
+
+        formattedAttributes[attr.key] = {
+          values: attr.values
+            .split(",")
+            .map((v) => v.trim())
+            .filter(Boolean),
           required: attr.required,
           filterable: attr.filterable,
         };
       });
 
-      const fd = new FormData();
-      fd.append("name", form.name);
-      fd.append("categoryId", form.categoryId);
-      fd.append("sizeType", form.sizeType);
-      fd.append("attributes", JSON.stringify(attrObj));
-      fd.append("variantAttributes", JSON.stringify(variantAttributes));
-
-      if (smallimage) fd.append("smallimage", smallimage);
-      if (bannerimage) fd.append("bannerimage", bannerimage);
-
-      if (editData) {
-        await api.put(`/subcategory/${editData._id}`, fd);
-      } else {
-        await api.post("/subcategory", fd);
+      formData.append("attributes", JSON.stringify(formattedAttributes));
+      /* IMAGES */
+      if (images.smallimage) {
+        formData.append("smallimage", images.smallimage);
       }
 
-      Swal.fire("Success", "Saved successfully", "success");
-      refresh();
-      onClose();
-    } catch {
-      Swal.fire("Error", "Failed", "error");
+      if (images.bannerimage) {
+        formData.append("bannerimage", images.bannerimage);
+      }
+
+      if (editData) {
+        await api.put(`/subcategory/${editData._id}`, formData);
+      } else {
+        await api.post("/subcategory", formData);
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: editData ? "SubCategory updated" : "SubCategory created",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setForm({ name: "", categoryId: "", sizeType: "alpha" });
+      setVariantAttributes([]);
+      setAttributes([]);
+      setImages({});
+
+      onSuccess?.();
+    } catch (err) {
+      Swal.fire({
+        icon: "warning",
+        title: "info",
+        text: err.response?.data?.message || "Something went wrong",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  /* ---------------- UI ---------------- */
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-      <div className="bg-white w-[900px] max-h-[90vh] overflow-y-auto rounded-xl p-6 space-y-4">
-        <h2 className="text-xl font-bold">
-          {editData ? "Edit" : "Create"} SubCategory
-        </h2>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {/* NAME */}
+      <input
+        type="text"
+        placeholder="SubCategory Name"
+        className="input-subCategory"
+        value={form.name}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
+        required
+      />
 
-        {/* NAME */}
-        <input
-          placeholder="Subcategory name"
-          className="input"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
+      {/* CATEGORY */}
+      <select
+        className="input-subCategory"
+        value={form.categoryId}
+        onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+        required
+      >
+        <option value="">Select Category</option>
+        {categories.map((cat) => (
+          <option key={cat._id} value={cat._id}>
+            {cat.name}
+          </option>
+        ))}
+      </select>
 
-        {/* PARENT CATEGORY */}
-        <select
-          className="input"
-          value={form.categoryId}
-          onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-        >
-          <option value="">Select category</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+      {/* SIZE TYPE */}
+      <select
+        className="input-subCategory"
+        value={form.sizeType}
+        onChange={(e) => setForm({ ...form, sizeType: e.target.value })}
+      >
+        <option value="alpha">Alpha</option>
+        <option value="numeric">Numeric</option>
+        <option value="free">Free</option>
+      </select>
 
-        {/* SIZE TYPE */}
-        <select
-          className="input"
-          value={form.sizeType}
-          onChange={(e) => setForm({ ...form, sizeType: e.target.value })}
-        >
-          <option value="alpha">Alpha (S,M,L)</option>
-          <option value="numeric">Numeric (28,30)</option>
-          <option value="free">Free Size</option>
-        </select>
+      {/* VARIANT ATTRIBUTES */}
+      <div>
+        {/* <h3 className="font-semibold">Variant Attributes</h3>
 
-        {/* ATTRIBUTES */}
-        <div>
-          <h3 className="font-semibold mb-2">Attributes</h3>
-
-          {attributes.map((attr, i) => (
-            <div key={i} className="grid grid-cols-4 gap-2 mb-2">
-              <input
-                placeholder="Name"
-                value={attr.name}
-                onChange={(e) => {
-                  const updated = [...attributes];
-                  updated[i].name = e.target.value;
-                  setAttributes(updated);
-                }}
-                className="input"
-              />
-
-              <input
-                placeholder="Values (comma separated)"
-                value={attr.values}
-                onChange={(e) => {
-                  const updated = [...attributes];
-                  updated[i].values = e.target.value;
-                  setAttributes(updated);
-                }}
-                className="input"
-              />
-
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={attr.required}
-                  onChange={(e) => {
-                    const updated = [...attributes];
-                    updated[i].required = e.target.checked;
-                    setAttributes(updated);
-                  }}
-                />
-                Required
-              </label>
-
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={attr.filterable}
-                  onChange={(e) => {
-                    const updated = [...attributes];
-                    updated[i].filterable = e.target.checked;
-                    setAttributes(updated);
-                  }}
-                />
-                Filterable
-              </label>
-
-              <button onClick={() => removeAttribute(i)}>❌</button>
-            </div>
-          ))}
-
-          <button onClick={addAttribute} className="btn">
-            + Add Attribute
+        <div className="flex gap-2">
+          <input
+            className="input-subCategory"
+            placeholder="size / color"
+            value={variantInput}
+            onChange={(e) => setVariantInput(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={addVariantAttribute}
+            className="btn-subCategory"
+          >
+            Add
           </button>
-        </div>
+        </div> */}
 
-        {/* VARIANT ATTRIBUTES */}
-        <div>
-          <h3 className="font-semibold">Variant Attributes</h3>
-          {["color", "size"].map((v) => (
-            <label key={v} className="mr-4">
-              <input
-                type="checkbox"
-                checked={variantAttributes.includes(v)}
-                onChange={() =>
-                  setVariantAttributes((prev) =>
-                    prev.includes(v)
-                      ? prev.filter((i) => i !== v)
-                      : [...prev, v],
+        <div className="flex gap-2 mt-2 flex-wrap">
+          {variantAttributes.map((v, i) => (
+            <span key={i} className="badge-subCategory flex items-center gap-2">
+              {v}
+              <button
+                type="button"
+                onClick={() =>
+                  setVariantAttributes(
+                    variantAttributes.filter((_, index) => index !== i),
                   )
                 }
-              />
-              {v}
-            </label>
+                className="text-red-500 text-xs"
+              >
+                ✕
+              </button>
+            </span>
           ))}
         </div>
-
-        {/* IMAGES */}
-        <input type="file" onChange={(e) => setSmallImage(e.target.files[0])} />
-        <input
-          type="file"
-          onChange={(e) => setBannerImage(e.target.files[0])}
-        />
-
-        {/* ACTIONS */}
-        <div className="flex justify-end gap-3">
-          <button onClick={onClose}>Cancel</button>
-          <button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving..." : "Save"}
-          </button>
-        </div>
       </div>
-    </div>
+
+      {/* ATTRIBUTES */}
+      <div>
+        <h3 className="font-semibold">Specifications</h3>
+
+        {attributes.map((attr, i) => (
+          <div
+            key={i}
+            className="grid grid-cols-2 gap-2 relative border p-3 rounded-xl"
+          >
+            <input
+              placeholder="Key (fabric)"
+              className="input-subCategory"
+              value={attr.key}
+              onChange={(e) => handleAttributeChange(i, "key", e.target.value)}
+            />
+
+            <input
+              placeholder="Values comma separated"
+              className="input-subCategory"
+              value={attr.values}
+              onChange={(e) =>
+                handleAttributeChange(i, "values", e.target.value)
+              }
+            />
+
+            {/* REQUIRED */}
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={attr.required}
+                onChange={(e) =>
+                  handleAttributeChange(i, "required", e.target.checked)
+                }
+              />
+              Required
+            </label>
+
+            {/* FILTERABLE */}
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={attr.filterable}
+                onChange={(e) =>
+                  handleAttributeChange(i, "filterable", e.target.checked)
+                }
+              />
+              Filterable
+            </label>
+
+            <button
+              type="button"
+              onClick={() =>
+                setAttributes(attributes.filter((_, index) => index !== i))
+              }
+              className="absolute -top-2 -right-2 text-red-500 text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+
+        <button type="button" onClick={addAttribute} className="btn mt-2">
+          + Add Attribute
+        </button>
+      </div>
+
+      {/* IMAGES */}
+      {images.smallimagePreview && (
+        <img
+          src={`${import.meta.env.VITE_BASE_URL}${images.smallimagePreview}`}
+          className="h-20 mb-2 rounded"
+        />
+      )}
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) =>
+          setImages({ ...images, smallimage: e.target.files[0] })
+        }
+      />
+      {images.smallimagePreview && (
+        <img
+          src={`${import.meta.env.VITE_BASE_URL}${images.smallimagePreview}`}
+          className="h-20 mb-2 rounded"
+        />
+      )}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) =>
+          setImages({ ...images, bannerimage: e.target.files[0] })
+        }
+      />
+
+      {/* SUBMIT */}
+
+      <button
+        disabled={loading}
+        className="btn-primary-subCategory w-full disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? "Creating..." : "Create SubCategory"}
+      </button>
+    </form>
   );
 };

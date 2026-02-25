@@ -9,6 +9,10 @@ export default function CategoryModal({ onClose, refresh, editData }) {
   const [showOnHome, setShowOnHome] = useState(editData?.showOnHome || false);
   const [isActive, setIsActive] = useState(editData?.isActive ?? true);
   const [description, setDescription] = useState(editData?.description || "");
+  const [wearTypes, setWearTypes] = useState([]); // list
+  const [selectedWearType, setSelectedWearType] = useState(
+    editData?.wearType?._id || "",
+  );
 
   const [smallimage, setSmallimage] = useState(null);
   const [bannerimage, setBannerimage] = useState(null);
@@ -19,6 +23,19 @@ export default function CategoryModal({ onClose, refresh, editData }) {
   const [bannerImagePreview, setBannerImagePreview] = useState(
     editData?.bannerimage || null,
   );
+  const fetchWearType = async () => {
+    try {
+      const res = await api.get("/wear/type");
+      if (res.data.success) {
+        setWearTypes(res.data.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching wear types:", error);
+    }
+  };
+  useEffect(() => {
+    fetchWearType();
+  }, []);
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -30,6 +47,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
       setShowOnHome(editData.showOnHome || false);
       setIsActive(editData.isActive ?? true);
       setDescription(editData.description || "");
+      setSelectedWearType(editData?.wearType?._id || "");
       setSmallImagePreview(
         editData.smallimage
           ? `${import.meta.env.VITE_BASE_URL}${editData.smallimage}`
@@ -100,6 +118,9 @@ export default function CategoryModal({ onClose, refresh, editData }) {
     } else if (name.length > 50) {
       newErrors.name = "Category name must be less than 50 characters";
     }
+    if (!selectedWearType) {
+      newErrors.wearType = "Wear type is required";
+    }
 
     if (displayOrder < 0) {
       newErrors.displayOrder = "Display order cannot be negative";
@@ -125,6 +146,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
       fd.append("displayOrder", displayOrder);
       fd.append("showOnHome", showOnHome);
       fd.append("isActive", isActive);
+      fd.append("wearTypeId", selectedWearType);
       if (description) fd.append("description", description);
 
       // Only append new images if they were selected
@@ -223,6 +245,26 @@ export default function CategoryModal({ onClose, refresh, editData }) {
 
         {/* Form */}
         <div className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {/* WEAR TYPE */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-700">
+              Wear Type <span className="text-red-500">*</span>
+            </label>
+
+            <select
+              value={selectedWearType}
+              onChange={(e) => setSelectedWearType(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#927f68]"
+            >
+              <option value="">Select Wear Type</option>
+
+              {wearTypes.map((wt) => (
+                <option key={wt._id} value={wt._id}>
+                  {wt.name}
+                </option>
+              ))}
+            </select>
+          </div>
           {/* NAME */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">

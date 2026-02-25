@@ -2,17 +2,11 @@ import { useState } from "react";
 import CategoryTable from "./CategoryTable";
 import AddProductModal from "../product/AddProductModal";
 
-
 export default function CategoryPage() {
   const [tab, setTab] = useState("category");
 
-
-
-  
   const [showAddProductModal, setShowAddProductModal] = useState(false);
 
-
-  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       {/* Header Section */}
@@ -33,13 +27,10 @@ export default function CategoryPage() {
           </svg>
           Category Management
         </h1>
-       
       </div>
 
       {/* Main Content Card */}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-      
-
         {/* Table Container with Animation */}
         <div className="p-6">
           <div className="transition-all duration-300 ease-in-out">
@@ -75,22 +66,19 @@ export default function CategoryPage() {
               })}
             </div>
 
-            <button 
-            onClick={
-              () => setShowAddProductModal(true)}
-            
-            className="px-4 py-2 bg-[#927f68] text-white rounded-lg hover:bg-[#7b6b57] transition">
-               Data
-            </button> 
+            {/* <button
+              onClick={() => setShowAddProductModal(true)}
+              className="px-4 py-2 bg-[#927f68] text-white rounded-lg hover:bg-[#7b6b57] transition"
+            >
+              Data
+            </button> */}
           </div>
         </div>
       </div>
 
       {showAddProductModal && (
-  <AddProductModal
-    onClose={() => setShowAddProductModal(false)}
-  />
-)}
+        <AddProductModal onClose={() => setShowAddProductModal(false)} />
+      )}
 
       {/* Add these styles to your global CSS or as a style tag */}
       <style jsx>{`
@@ -109,10 +97,6 @@ export default function CategoryPage() {
           animation: fadeIn 0.3s ease-out forwards;
         }
       `}</style>
-
-
     </div>
-
-    
   );
 }
