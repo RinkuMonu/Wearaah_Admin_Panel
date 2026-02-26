@@ -7,10 +7,10 @@ export default function SubCategoryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       {/* Header Section */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+       <div className="mb-6 bg-[#f5efdd] p-4 rounded-md">
+        <h1 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
           <svg
-            className="w-8 h-8 text-blue-600"
+            className="w-6 h-6 text-[#927f68]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -22,17 +22,14 @@ export default function SubCategoryPage() {
               d="M4 6h16M4 12h16M4 18h7"
             />
           </svg>
-          Category Management
+          Sub Category
         </h1>
-        <p className="text-gray-600 mt-1">
-          Manage your product categories and subcategories
-        </p>
       </div>
 
       {/* Main Content Card */}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         {/* Custom Tab Navigation */}
-        <div className="px-6 pt-6">
+        {/* <div className="px-6 pt-6">
           <div className="flex gap-2 bg-gray-100 p-1 rounded-xl w-fit">
             <button
               onClick={() => setTab("category")}
@@ -64,7 +61,7 @@ export default function SubCategoryPage() {
             </button>
           </div>
 
-          {/* Tab Content Indicator */}
+        
           <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
             <div
               className={`w-2 h-2 rounded-full ${tab === "category" ? "bg-blue-600" : "bg-gray-300"}`}
@@ -74,7 +71,7 @@ export default function SubCategoryPage() {
               {tab === "category" ? "all categories" : "all subcategories"}
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* Table Container with Animation */}
         <div className="p-6">

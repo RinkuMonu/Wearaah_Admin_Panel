@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import RichTextEditor from "./RichTextEditor";
 import api from "../../../serviceAuth/axios";
 import DynamicSpecificationsEdit from "./DynamicEDITSpecifications";
+import { RotateCcw, CheckCircle2 } from "lucide-react";
 
 export default function EditProductModal({ product, onClose, onSuccess }) {
   console.log(product);
@@ -133,15 +134,16 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
               />
             </div>
 
-            {/* DESCRIPTION */}
+             {/* SPECIFICATIONS */}
             <div className="col-span-2">
-              <label className="text-sm">Description *</label>
-              <RichTextEditor
-                key={product?._id}
-                content={form.description}
-                onChange={handleDescriptionChange}
+              <DynamicSpecificationsEdit
+                subCategoryId={product.subCategoryId}
+                initialSpecs={form.specifications}
+                onChange={handleSpecificationsChange}
               />
             </div>
+
+           
 
             {/* IMAGES */}
             <div className="col-span-2">
@@ -164,50 +166,77 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
             </div>
 
             {/* RETURN POLICY */}
-            <div>
-              <label className="text-sm">Return Days</label>
-              <input
-                type="number"
-                name="returnPolicyDays"
-                value={form.returnPolicyDays}
-                onChange={handleChange}
-                className="input"
-              />
-            </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            {/* STATUS */}
-            <div>
-              <label className="text-sm">Status</label>
-              <select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                className="input"
-              >
-                <option value="draft">Draft</option>
-                <option value="pending">Submit for QC</option>
-              </select>
-            </div>
+  {/* RETURN DAYS */}
+  <div className=" p-4 rounded-xl border border-[#927f68]/30 shadow-sm">
+    <label className="text-sm font-medium text-[#927f68] mb-2 flex items-center gap-2">
+      <RotateCcw size={16} />
+      Return Days
+    </label>
 
-            {/* SPECIFICATIONS */}
+    <div className="relative">
+      <input
+        type="number"
+        name="returnPolicyDays"
+        value={form.returnPolicyDays}
+        onChange={handleChange}
+        placeholder="Enter number of days"
+        className="w-full px-4 py-2 rounded-lg border border-[#927f68]/40 
+                   focus:outline-none focus:ring-2 focus:ring-[#927f68] 
+                   bg-white transition"
+      />
+
+      {/* Optional suffix */}
+      <span className="absolute right-3 top-2.5 text-sm text-gray-400">
+        Days
+      </span>
+    </div>
+  </div>
+
+  {/* STATUS */}
+  <div className=" p-4 rounded-xl border border-[#927f68]/30 shadow-sm">
+    <label className="text-sm font-medium text-[#927f68] mb-2 flex items-center gap-2">
+      <CheckCircle2 size={16} />
+      Status
+    </label>
+
+    <select
+      name="status"
+      value={form.status}
+      onChange={handleChange}
+      className="w-full px-4 py-2 rounded-lg border border-[#927f68]/40 
+                 focus:outline-none focus:ring-2 focus:ring-[#927f68] 
+                 bg-white transition"
+    >
+      <option value="draft">Draft</option>
+      <option value="pending">Submit for QC</option>
+    </select>
+  </div>
+
+</div>
+             {/* DESCRIPTION */}
             <div className="col-span-2">
-              <DynamicSpecificationsEdit
-                subCategoryId={product.subCategoryId}
-                initialSpecs={form.specifications}
-                onChange={handleSpecificationsChange}
+              <label className="text-sm">Description *</label>
+              <RichTextEditor
+                key={product?._id}
+                content={form.description}
+                onChange={handleDescriptionChange}
               />
             </div>
+
+           
           </div>
 
           {/* BUTTONS */}
           <div className="flex justify-end gap-4 mt-8 pt-6 border-t">
-            <button type="button" onClick={onClose} className=" cursor-pointer">
+            <button type="button" onClick={onClose} className="bg-gray-200 rounded-md py-2 px-5 hover:bg-gray-500 hover:text-white cursor-pointer">
               Cancel
             </button>
 
             <button
               disabled={loading}
-              className="btn-primary cursor-pointer"
+              className="bg-[#927f68] text-white px-4 py-2 rounded-md cursor-pointer hover:bg-[#7a6c5a] transition disabled:opacity-50 disabled:cursor-not-allowed"
               type="submit"
             >
               {loading ? "Updating..." : "Update Product"}

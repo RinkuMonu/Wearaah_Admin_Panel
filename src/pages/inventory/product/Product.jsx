@@ -564,6 +564,8 @@ export default function ProductPage() {
     }
   };
 
+
+
   return (
     <>
       {editOpen && selectedProduct && (
@@ -852,20 +854,19 @@ export default function ProductPage() {
                               setSelectedProduct(product);
                               setEditOpen(true);
                             }}
-                            className="text-indigo-600"
-                          >
-                            <FileChartPieIcon />
+                            className="text-gray-600 hover:text-purple-600 hover:bg-purple-100 p-1 rounded-md" >
+                            <FileChartPieIcon size={18} />
                           </button>
                           <button
                             onClick={() => handleAddVariant(product)}
-                            className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
+                            className="text-gray-600 hover:text-blue-600 p-1 rounded hover:bg-blue-100"
                             title="Add Variant"
                           >
                             <Layers size={18} />
                           </button>
                           <button
                             onClick={() => handleViewVariants(product)}
-                            className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50"
+                            className="text-gray-600 hover:text-green-600 p-1 rounded hover:bg-green-100"
                             title="View Variants"
                           >
                             <Eye size={18} />

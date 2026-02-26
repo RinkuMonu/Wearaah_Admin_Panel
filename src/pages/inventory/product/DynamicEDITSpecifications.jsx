@@ -108,51 +108,66 @@ useEffect(() => {
     return <p className="text-sm text-gray-500">Loading specifications...</p>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between">
-        <label className="text-sm font-medium">Product Specifications</label>
+  <div className="space-y-4">
 
-        <button
-          type="button"
-          onClick={addSpecification}
-          className="flex items-center gap-1 text-sm text-[#927f68]"
-        >
-          <Plus size={16} /> Add
-        </button>
-      </div>
+  <div className="flex justify-between items-center">
+    <label className="text-sm font-medium">
+      Product Specifications
+    </label>
 
-      {specifications.map((spec) => (
-        <div key={spec.id} className="flex gap-3 items-start">
-          <div className="flex-1">
-            <p className="text-sm mb-1 capitalize">{spec.key}</p>
+    <button
+      type="button"
+      onClick={addSpecification}
+      className="flex items-center gap-1 text-sm text-[#927f68]"
+    >
+      <Plus size={16} /> Add
+    </button>
+  </div>
 
-            <select
-              value={spec.value}
-              required={spec.required}
-              onChange={(e) => updateValue(spec.id, e.target.value)}
-              className="w-full border px-3 py-2 rounded-md text-sm"
-            >
-              <option value="">Select {spec.key}</option>
+  {/* 🔥 GRID HERE */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-              {spec.options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          </div>
+    {specifications.map((spec) => (
+      <div
+        key={spec.id}
+        className="flex gap-3 rounded-md"
+      >
 
-          {!spec.required && (
-            <button
-              type="button"
-              onClick={() => removeSpecification(spec.id)}
-              className="mt-6 text-red-500"
-            >
-              <X size={18} />
-            </button>
-          )}
+        <div className="flex-1">
+          <p className="text-sm mb-1 capitalize text-[#927f68]">
+            {spec.key}
+          </p>
+
+          <select
+            value={spec.value}
+            required={spec.required}
+            onChange={(e) => updateValue(spec.id, e.target.value)}
+            className="w-full border border-gray-200 shadow-md px-3 py-2 rounded-md text-sm focus:ring-2 focus:ring-[#dbd2c6]"
+          >
+            <option value="">Select {spec.key}</option>
+
+            {spec.options.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
         </div>
-      ))}
-    </div>
+
+        {!spec.required && (
+          <button
+            type="button"
+            onClick={() => removeSpecification(spec.id)}
+            className="mt-6 text-red-500 hover:scale-110 transition"
+          >
+            <X size={18} />
+          </button>
+        )}
+
+      </div>
+    ))}
+
+  </div>
+</div>
   );
 }
