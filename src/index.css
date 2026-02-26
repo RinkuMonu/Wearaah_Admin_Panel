@@ -26,7 +26,7 @@
 }
 
 .input-subCategory {
-  @apply w-full border rounded-lg px-3 py-2;
+  @apply w-full border border-gray-200 shadow-md rounded-md px-3 py-2;
 }
 
 .btn-subCategory {
@@ -39,4 +39,12 @@
 
 .badge-subCategory {
   @apply bg-blue-100 text-blue-600 px-2 py-1 rounded;
+}
+/* option:not(.placeholder):hover {
+    background-color: #5aafee;
+} */
+ option:hover,
+option:focus {
+  background: red;
+  fill: aquamarine;
 }

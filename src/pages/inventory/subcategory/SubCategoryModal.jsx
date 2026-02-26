@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import api from "../../../serviceAuth/axios";
+import { Trash } from "lucide-react";
 
 export const SubCategoryModal = ({ onSuccess, editData }) => {
   const [categories, setCategories] = useState([]);
@@ -180,9 +181,10 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
   /* ---------------- UI ---------------- */
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5 ">
       {/* NAME */}
-      <input
+   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <input
         type="text"
         placeholder="SubCategory Name"
         className="input-subCategory"
@@ -215,7 +217,8 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
         <option value="alpha">Alpha</option>
         <option value="numeric">Numeric</option>
         <option value="free">Free</option>
-      </select>
+      </select> 
+    </div>
 
       {/* VARIANT ATTRIBUTES */}
       <div>
@@ -264,7 +267,7 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
         {attributes.map((attr, i) => (
           <div
             key={i}
-            className="grid grid-cols-2 gap-2 relative border p-3 rounded-xl"
+            className="grid grid-cols-2 gap-2 relative my-3"
           >
             <input
               placeholder="Key (fabric)"
@@ -295,7 +298,7 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
             </label>
 
             {/* FILTERABLE */}
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center  gap-2 text-sm">
               <input
                 type="checkbox"
                 checked={attr.filterable}
@@ -311,9 +314,9 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
               onClick={() =>
                 setAttributes(attributes.filter((_, index) => index !== i))
               }
-              className="absolute -top-2 -right-2 text-red-500 text-xs"
+              className="absolute top-13 right-2 col-span-2 text-red-500 text-xs"
             >
-              ✕
+             <Trash className="w-5 h-5" />
             </button>
           </div>
         ))}
@@ -324,39 +327,48 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
       </div>
 
       {/* IMAGES */}
-      {images.smallimagePreview && (
-        <img
-          src={`${import.meta.env.VITE_BASE_URL}${images.smallimagePreview}`}
-          className="h-20 mb-2 rounded"
-        />
-      )}
+     <div className="flex items-center gap-4">
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) =>
-          setImages({ ...images, smallimage: e.target.files[0] })
-        }
-      />
-      {images.smallimagePreview && (
-        <img
-          src={`${import.meta.env.VITE_BASE_URL}${images.smallimagePreview}`}
-          className="h-20 mb-2 rounded"
-        />
-      )}
-      <input
+  {/* File Input */}
+  <input
+    type="file"
+    className="bg-gray-100 p-2 rounded-md"
+    accept="image/*"
+    onChange={(e) =>
+      setImages({
+        ...images,
+        smallimage: e.target.files[0],
+        smallimagePreview: URL.createObjectURL(e.target.files[0]),
+      })
+    }
+  />
+
+  {/* Preview (for new or existing image) */}
+  {(images.smallimagePreview || images.smallimage) && (
+    <img
+      src={
+        images.smallimage
+          ? URL.createObjectURL(images.smallimage)
+          : `${import.meta.env.VITE_BASE_URL}${images.smallimagePreview}`
+      }
+      className="h-20 w-20 object-cover rounded border border-gray-200"
+    />
+  )}
+
+</div>
+      {/* <input
         type="file"
         accept="image/*"
         onChange={(e) =>
           setImages({ ...images, bannerimage: e.target.files[0] })
         }
-      />
+      /> */}
 
       {/* SUBMIT */}
 
       <button
         disabled={loading}
-        className="btn-primary-subCategory w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-[#927f68] text-[#fdefdd] rounded-lg hover:bg-[#927f68]/80 py-2 w-full disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? "Creating..." : "Create SubCategory"}
       </button>
