@@ -14,9 +14,21 @@ import CategoryPage from "./pages/inventory/category/CategoryPage";
 import BrandPage from "./pages/BrandPage/BrandPage";
 import ContactPage from "./pages/ContactPage/ContactPage";
 import SubCategoryPage from "./pages/inventory/subcategory/subcategoryPage";
+import { QuickBilling } from "./pages/QuickBilling/quickBilling";
+import LeadsPage from "./pages/LeadPage/leadpage";
+import { OrdersPage } from "./pages/Orderpage/order";
+import { useEffect } from "react";
+import GlobalOrderAlert from "./Config/GlobalOrderAlert";
 
 function App() {
+  useEffect(() => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
   return (
+    <>
+    <GlobalOrderAlert />
     <BrowserRouter>
       <Routes>
         <Route element={<PublicRoute />}>
@@ -31,6 +43,7 @@ function App() {
             >
               <Route path="category" element={<CategoryPage />} />
               <Route path="subcategory" element={<SubCategoryPage />} />
+              <Route path="leadwehave" element={<LeadsPage />} />
             </Route>
             <Route element={<RoleProtectedRoute allowedRoles={["seller"]} />}>
               {/* nothing */}
@@ -44,13 +57,16 @@ function App() {
               <Route path="product" element={<ProductPage />} />
               <Route path="stock" element={<StockPage />} />
               <Route path="brand" element={<BrandPage />} />
+              <Route path="odersPage" element={<OrdersPage />} />
               <Route path="contact" element={<ContactPage />} />
+              <Route path="quickbilling" element={<QuickBilling />} />
             </Route>
           </Route>
         </Route>
         <Route path="unauthorized" element={<Unauthorized />} />
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 

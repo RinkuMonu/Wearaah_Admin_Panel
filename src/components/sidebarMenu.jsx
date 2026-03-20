@@ -1,8 +1,11 @@
 import {
   Boxes,
+  FeatherIcon,
   LayoutDashboard,
+  ListOrderedIcon,
   MessageSquare,
   Truck,
+  UserCheck2,
   Users,
 } from "lucide-react";
 
@@ -31,6 +34,24 @@ export const menuItems = [
     ],
   },
 
+  {
+    name: "Quick Billing",
+    path: "/quickbilling",
+    icon: FeatherIcon,
+    roles: ["superadmin", "seller"],
+  },
+  {
+    name: "Order Management",
+    path: "/odersPage",
+    icon: ListOrderedIcon,
+    roles: ["superadmin", "seller"],
+  },
+  {
+    name: "Lead We Have",
+    path: "/leadwehave",
+    icon: UserCheck2,
+    roles: ["superadmin"],
+  },
   {
     name: "Employee",
     path: "/employee",

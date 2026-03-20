@@ -16,6 +16,8 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
   const [variantAttributes, setVariantAttributes] = useState([]);
   console.log(variantAttributes);
   const [variantInput, setVariantInput] = useState("");
+  const [displayOrder, setDisplayOrder] = useState(0);
+  const [showOnHome, setShowOnHome] = useState(false);
 
   const [attributes, setAttributes] = useState([]);
   const [images, setImages] = useState({});
@@ -35,10 +37,14 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
     if (editData) {
       setForm({
         name: editData.name || "",
-        categoryId: editData.categoryId?._id || "",
+        categoryId:
+        typeof editData.categoryId === "object"
+          ? editData.categoryId._id
+          : editData.categoryId || "",
         sizeType: editData.sizeType || "alpha",
       });
-
+      setDisplayOrder(editData.displayOrder || 0); // ✅ add
+      setShowOnHome(editData.showOnHome || false); // ✅ add
       // ✅ VARIANT ATTRIBUTES
       setVariantAttributes(editData.variantAttributes || []);
 
@@ -63,28 +69,6 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
       });
     }
   }, [editData]);
-  /* ---------------- VARIANT ATTRIBUTES ---------------- */
-
-  // const addVariantAttribute = () => {
-  //   const value = variantInput.trim().toLowerCase();
-
-  //   if (!value) return;
-
-  //   if (variantAttributes.includes(value)) {
-  //     return Swal.fire({
-  //       icon: "info",
-  //       title: "Duplicate",
-  //       text: "Variant attribute already added",
-  //       timer: 1200,
-  //       showConfirmButton: false,
-  //     });
-  //   }
-
-  //   setVariantAttributes([...variantAttributes, value]);
-  //   setVariantInput("");
-  // };
-
-  /* ---------------- ATTRIBUTES BUILDER ---------------- */
 
   const addAttribute = () => {
     setAttributes([
@@ -115,7 +99,8 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
       formData.append("name", form.name);
       formData.append("categoryId", form.categoryId);
       formData.append("sizeType", form.sizeType);
-
+      formData.append("displayOrder", displayOrder);
+      formData.append("showOnHome", showOnHome);
       /* VARIANT ATTRIBUTES */
       formData.append("variantAttributes", JSON.stringify(variantAttributes));
 
@@ -183,42 +168,81 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-5 ">
       {/* NAME */}
-   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-       <input
-        type="text"
-        placeholder="SubCategory Name"
-        className="input-subCategory"
-        value={form.name}
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
-        required
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input
+          type="text"
+          placeholder="SubCategory Name"
+          className="input-subCategory"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          required
+        />
 
-      {/* CATEGORY */}
-      <select
-        className="input-subCategory"
-        value={form.categoryId}
-        onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-        required
-      >
-        <option value="">Select Category</option>
-        {categories.map((cat) => (
-          <option key={cat._id} value={cat._id}>
-            {cat.name}
-          </option>
-        ))}
-      </select>
+        {/* CATEGORY */}
+        <select
+          className="input-subCategory"
+          value={form.categoryId}
+          onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+          required
+        >
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
 
-      {/* SIZE TYPE */}
-      <select
-        className="input-subCategory"
-        value={form.sizeType}
-        onChange={(e) => setForm({ ...form, sizeType: e.target.value })}
-      >
-        <option value="alpha">Alpha</option>
-        <option value="numeric">Numeric</option>
-        <option value="free">Free</option>
-      </select> 
-    </div>
+        {/* SIZE TYPE */}
+        <select
+          className="input-subCategory"
+          value={form.sizeType}
+          onChange={(e) => setForm({ ...form, sizeType: e.target.value })}
+        >
+          <option value="alpha">Alpha</option>
+          <option value="numeric">Numeric</option>
+          <option value="free">Free</option>
+        </select>
+      </div>
+
+      <div className="space-y-2 flex justify-between px-2">
+        <div className="">
+          <label className="block text-sm font-semibold text-gray-700">
+            Display Order
+          </label>
+          <input
+            type="text"
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#927f68] focus:border-[#927f68] transition-all `}
+            placeholder="0"
+            value={displayOrder}
+            onChange={(e) => {
+              setDisplayOrder(parseInt(e.target.value) || 0);
+              if (errors.displayOrder)
+                setErrors({ ...errors, displayOrder: null });
+            }}
+            min="0"
+          />
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            <div>
+              <p className="font-semibold text-gray-700">Show on Homepage</p>
+              <p className="text-sm text-gray-500">
+                Display this category on the homepage
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={showOnHome}
+                onChange={() => setShowOnHome(!showOnHome)}
+              />
+              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+        </div>
+      </div>
 
       {/* VARIANT ATTRIBUTES */}
       <div>
@@ -265,10 +289,7 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
         <h3 className="font-semibold">Specifications</h3>
 
         {attributes.map((attr, i) => (
-          <div
-            key={i}
-            className="grid grid-cols-2 gap-2 relative my-3"
-          >
+          <div key={i} className="grid grid-cols-2 gap-2 relative my-3">
             <input
               placeholder="Key (fabric)"
               className="input-subCategory"
@@ -316,7 +337,7 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
               }
               className="absolute top-13 right-2 col-span-2 text-red-500 text-xs"
             >
-             <Trash className="w-5 h-5" />
+              <Trash className="w-5 h-5" />
             </button>
           </div>
         ))}
@@ -327,35 +348,33 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
       </div>
 
       {/* IMAGES */}
-     <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4">
+        {/* File Input */}
+        <input
+          type="file"
+          className="bg-gray-100 p-2 rounded-md"
+          accept="image/*"
+          onChange={(e) =>
+            setImages({
+              ...images,
+              smallimage: e.target.files[0],
+              smallimagePreview: URL.createObjectURL(e.target.files[0]),
+            })
+          }
+        />
 
-  {/* File Input */}
-  <input
-    type="file"
-    className="bg-gray-100 p-2 rounded-md"
-    accept="image/*"
-    onChange={(e) =>
-      setImages({
-        ...images,
-        smallimage: e.target.files[0],
-        smallimagePreview: URL.createObjectURL(e.target.files[0]),
-      })
-    }
-  />
-
-  {/* Preview (for new or existing image) */}
-  {(images.smallimagePreview || images.smallimage) && (
-    <img
-      src={
-        images.smallimage
-          ? URL.createObjectURL(images.smallimage)
-          : `${import.meta.env.VITE_BASE_URL}${images.smallimagePreview}`
-      }
-      className="h-20 w-20 object-cover rounded border border-gray-200"
-    />
-  )}
-
-</div>
+        {/* Preview (for new or existing image) */}
+        {(images.smallimagePreview || images.smallimage) && (
+          <img
+            src={
+              images.smallimage
+                ? URL.createObjectURL(images.smallimage)
+                : `${import.meta.env.VITE_BASE_URL}${images.smallimagePreview}`
+            }
+            className="h-20 w-20 object-cover rounded border border-gray-200"
+          />
+        )}
+      </div>
       {/* <input
         type="file"
         accept="image/*"
