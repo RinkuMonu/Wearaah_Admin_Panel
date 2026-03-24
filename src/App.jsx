@@ -19,6 +19,8 @@ import LeadsPage from "./pages/LeadPage/leadpage";
 import { OrdersPage } from "./pages/Orderpage/order";
 import { useEffect } from "react";
 import GlobalOrderAlert from "./Config/GlobalOrderAlert";
+import SellerStepper from "./pages/SellerStepperForm/SellerStepper";
+import SellerList from "./pages/UserManagement/seller";
 
 function App() {
   useEffect(() => {
@@ -28,44 +30,46 @@ function App() {
   }, []);
   return (
     <>
-    <GlobalOrderAlert />
-    <BrowserRouter>
-      <Routes>
-        <Route element={<PublicRoute />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-        </Route>
-        <Route element={<ProtectedRoute />}>
-          <Route element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route
-              element={<RoleProtectedRoute allowedRoles={["superadmin"]} />}
-            >
-              <Route path="category" element={<CategoryPage />} />
-              <Route path="subcategory" element={<SubCategoryPage />} />
-              <Route path="leadwehave" element={<LeadsPage />} />
-            </Route>
-            <Route element={<RoleProtectedRoute allowedRoles={["seller"]} />}>
-              {/* nothing */}
-            </Route>
-            <Route
-              element={
-                <RoleProtectedRoute allowedRoles={["seller", "superadmin"]} />
-              }
-            >
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="product" element={<ProductPage />} />
-              <Route path="stock" element={<StockPage />} />
-              <Route path="brand" element={<BrandPage />} />
-              <Route path="odersPage" element={<OrdersPage />} />
-              <Route path="contact" element={<ContactPage />} />
-              <Route path="quickbilling" element={<QuickBilling />} />
+      <GlobalOrderAlert />
+      <BrowserRouter>
+        <Routes>
+          <Route path="SellerStepper" element={<SellerStepper />} />
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route
+                element={<RoleProtectedRoute allowedRoles={["superadmin"]} />}
+              >
+                <Route path="category" element={<CategoryPage />} />
+                <Route path="subcategory" element={<SubCategoryPage />} />
+                <Route path="leadwehave" element={<LeadsPage />} />
+                <Route path="SellerManagementTable" element={<SellerList />} />
+              </Route>
+              <Route element={<RoleProtectedRoute allowedRoles={["seller"]} />}>
+                {/* nothing */}
+              </Route>
+              <Route
+                element={
+                  <RoleProtectedRoute allowedRoles={["seller", "superadmin"]} />
+                }
+              >
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="product" element={<ProductPage />} />
+                <Route path="stock" element={<StockPage />} />
+                <Route path="brand" element={<BrandPage />} />
+                <Route path="odersPage" element={<OrdersPage />} />
+                <Route path="contact" element={<ContactPage />} />
+                <Route path="quickbilling" element={<QuickBilling />} />
+              </Route>
             </Route>
           </Route>
-        </Route>
-        <Route path="unauthorized" element={<Unauthorized />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="unauthorized" element={<Unauthorized />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }

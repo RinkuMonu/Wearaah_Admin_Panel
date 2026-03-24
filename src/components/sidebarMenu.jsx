@@ -5,6 +5,7 @@ import {
   ListOrderedIcon,
   MessageSquare,
   Truck,
+  User2,
   UserCheck2,
   Users,
 } from "lucide-react";
@@ -15,6 +16,20 @@ export const menuItems = [
     path: "/",
     icon: LayoutDashboard,
     roles: ["superadmin", "seller", "employee"],
+  },
+
+  {
+    name: "User Management",
+    icon: User2,
+    roles: ["superadmin"],
+    submenu: [
+      {
+        name: "Seller",
+        path: "/SellerManagementTable",
+        roles: ["superadmin"],
+      },
+      // { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
+    ],
   },
 
   {
