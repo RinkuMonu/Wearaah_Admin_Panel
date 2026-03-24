@@ -2,7 +2,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const api = axios.create({
-  baseURL: "https://vmm9pgj8-5000.inc1.devtunnels.ms/api",
+  baseURL: "http://localhost:5000/api",
+  // baseURL: "https://vmm9pgj8-5000.inc1.devtunnels.ms/api",
 });
 
 // 🔐 Attach token
