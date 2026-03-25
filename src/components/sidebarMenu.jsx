@@ -8,6 +8,7 @@ import {
   User2,
   UserCheck2,
   Users,
+  WeightTilde,
 } from "lucide-react";
 
 export const menuItems = [
@@ -45,7 +46,6 @@ export const menuItems = [
       { name: "Brand", path: "/brand", roles: ["superadmin", "seller"] },
       { name: "Category", path: "/category", roles: ["superadmin"] },
       { name: "Sub Category", path: "/subcategory", roles: ["superadmin"] },
-      { name: "Stock", path: "/stock", roles: ["superadmin", "seller"] },
     ],
   },
 
@@ -59,6 +59,12 @@ export const menuItems = [
     name: "Order Management",
     path: "/odersPage",
     icon: ListOrderedIcon,
+    roles: ["superadmin", "seller"],
+  },
+  {
+    name: "Stock Management",
+    path: "/Variant/Stock/Management",
+    icon: WeightTilde,
     roles: ["superadmin", "seller"],
   },
   {

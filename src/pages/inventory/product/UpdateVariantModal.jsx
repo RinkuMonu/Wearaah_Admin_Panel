@@ -37,8 +37,8 @@ export default function UpdateVariantModal({
   const [form, setForm] = useState({
     variantTitle: variant.variantTitle || "",
     variantDiscription: variant.variantDiscription || "",
-    size: variant.size || variant.attributes?.size || "",
-    color: variant.color || variant.attributes?.color || "",
+    size: variant.size || "",
+    color: variant.color || "",
     pricing: {
       costPrice: variant.pricing?.costPrice || "",
       mrp: variant.pricing?.mrp || "",
