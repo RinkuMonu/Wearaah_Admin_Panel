@@ -1,20 +1,30 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { debounce } from "lodash";
+import { useMemo } from "react";
 import api from "../../../serviceAuth/axios";
 import { SubCategoryModal } from "./SubCategoryModal";
 
 export const SubCategoryTable = () => {
   const [data, setData] = useState([]);
+  const [dataparent, setDataparent] = useState([]);
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const fetchData = async () => {
+  const fetchData = async (search = "", category = "all") => {
     try {
       setLoading(true);
-      const res = await api.get("/subcategory");
+
+      const params = {};
+
+      if (search) params.search = search;
+      if (category !== "all") params.pareId = category;
+
+      const res = await api.get("/subcategory", { params });
+
       setData(res.data.categories || []);
     } catch (error) {
       Swal.fire({
@@ -30,8 +40,16 @@ export const SubCategoryTable = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(searchTerm, selectedCategory);
   }, []);
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value, category) => {
+        fetchData(value, category);
+      }, 500),
+    [],
+  );
 
   const deleteSubCategory = async (id, name) => {
     const result = await Swal.fire({
@@ -70,23 +88,23 @@ export const SubCategoryTable = () => {
     }
   };
 
-  // Get unique parent categories for filter
-  const parentCategories = [
-    ...new Set(data.map((item) => item.parentCategory?.name).filter(Boolean)),
-  ];
-
-  // Filter data based on search term and category filter
-  const filteredData = data.filter((item) => {
-    const matchesSearch =
-      item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.parentCategory?.name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" ||
-      item.parentCategory?.name === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const fetchDataParentCate = async () => {
+    try {
+      const res = await api.get("/category/nameonly");
+      setDataparent(res.data.categories || []);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to fetch categories",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  };
+  useEffect(() => {
+    fetchDataParentCate();
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -95,7 +113,7 @@ export const SubCategoryTable = () => {
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-800">Subcategories</h2>
           <span className="px-2 py-1 text-xs font-medium bg-[#f5efdd] text-[#927f68] rounded-full">
-            {filteredData.length} Total
+            {data.length} Total
           </span>
         </div>
 
@@ -143,27 +161,30 @@ export const SubCategoryTable = () => {
             type="text"
             placeholder="Search subcategories..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearchTerm(value);
+              debouncedSearch(value, selectedCategory);
+            }}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#927f68] focus:border-transparent transition-all"
           />
         </div>
 
         <select
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSelectedCategory(value);
+            fetchData(searchTerm, value);
+          }}
           className="px-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
         >
           <option value="all">
-            
-            <span>All Categories</span></option>
-          <option value="all2">
-            <span>ABC</span></option>
-          <option value="all3">123</option>
-          <option value="all4">XYZ</option>
-          <option value="all5">9101</option>
-          {parentCategories.map((category, index) => (
-            <option key={index} value={category}>
-              {category}
+            <span>All Categories</span>
+          </option>
+          {dataparent.map((category, index) => (
+            <option key={index} value={category._id}>
+              {category.name}
             </option>
           ))}
         </select>
@@ -178,7 +199,7 @@ export const SubCategoryTable = () => {
             </div>
             <p className="mt-4 text-gray-500">Loading subcategories...</p>
           </div>
-        ) : filteredData.length === 0 ? (
+        ) : data.length === 0 ? (
           <div className="text-center py-12">
             <svg
               className="w-16 h-16 mx-auto text-gray-400"
@@ -289,7 +310,7 @@ export const SubCategoryTable = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredData.map((item, index) => (
+              {data.map((item, index) => (
                 <tr
                   key={item._id}
                   className="hover:bg-gray-50 transition-colors group"
@@ -398,10 +419,10 @@ export const SubCategoryTable = () => {
       </div>
 
       {/* Footer */}
-      {!loading && filteredData.length > 0 && (
+      {!loading && data.length > 0 && (
         <div className="flex items-center justify-between text-sm text-gray-600">
           <p>
-            Showing {filteredData.length} of {data.length} subcategories
+            Showing {data.length} of {data.length} subcategories
           </p>
           <div className="flex items-center gap-2">
             <button

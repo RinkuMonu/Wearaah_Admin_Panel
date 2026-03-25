@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../serviceAuth/axios";
 import { useAuth } from "../serviceAuth/context";
 import Swal from "sweetalert2";
+import { unlockAudio } from "../Config/audio";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState("email");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -60,6 +62,8 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    await unlockAudio();
+    setErrors({});
 
     let newErrors = {};
 
@@ -80,8 +84,8 @@ export default function LoginPage() {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      console.log("Validation errors:", newErrors);
-      return setErrors(newErrors);
+      setErrors(newErrors);
+      return;
     }
 
     try {
@@ -109,11 +113,16 @@ export default function LoginPage() {
         setToken(data.token);
         localStorage.setItem("authToken", data.token);
         setTimeout(() => {
-          window.location.href = "/";
+          navigate("/");
         }, 1500);
       }
     } catch (err) {
       console.log(err);
+
+      setErrors({
+        password: err.response?.data?.message || "Invalid credentials",
+      });
+
       Swal.fire({
         toast: true,
         position: "top-right",
@@ -121,8 +130,6 @@ export default function LoginPage() {
         title: err.response?.data?.message || "Login failed",
         showConfirmButton: false,
         timer: 1500,
-        width: "300px",
-        padding: "10px",
       });
     } finally {
       setIsLoading(false);
@@ -147,7 +154,7 @@ export default function LoginPage() {
         {/* LOGIN FORM */}
         <div className="w-[400px] text-white ">
           <h2 className="text-4xl font-bold mb-6 text-center">Sign In</h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} noValidate className="space-y-6">
             {/* EMAIL LOGIN */}
             {loginMethod === "email" && (
               <>
@@ -159,7 +166,6 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
                     className="w-full mt-1 px-3 py-2 rounded-md bg-white text-black"
-                    required
                   />
                   {errors.email && (
                     <p className="text-red-500 text-sm">{errors.email}</p>
@@ -270,6 +276,7 @@ export default function LoginPage() {
                     <input
                       type="text"
                       value={otp}
+                      required={useOtp}
                       onChange={(e) => {
                         const value = e.target.value.replace(/\D/g, "");
                         if (value.length <= 6) {
@@ -289,7 +296,6 @@ export default function LoginPage() {
                       className={`w-full mt-1 px-3 py-2 rounded-md bg-white text-black border ${
                         errors.otp ? "border-red-500" : "border-transparent"
                       }`}
-                      required
                     />
 
                     {/* Red Error Message */}
@@ -316,11 +322,7 @@ export default function LoginPage() {
             {loginMethod && (
               <button
                 type="submit"
-                disabled={
-                  isloading ||
-                  (!validateEmail(email) && loginMethod === "email") ||
-                  (!validateMobile(mobile) && loginMethod === "mobile")
-                }
+                disabled={isloading}
                 className={`w-full bg-[#927f68] hover:bg-[#625646] py-2 rounded-md font-medium mt-4 ${
                   isloading
                     ? "opacity-50 cursor-not-allowed"

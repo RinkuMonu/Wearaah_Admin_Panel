@@ -6,13 +6,9 @@ export default function CategoryModal({ onClose, refresh, editData }) {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const [name, setName] = useState(editData?.name || "");
   const [displayOrder, setDisplayOrder] = useState(editData?.displayOrder || 0);
-  const [showOnHome, setShowOnHome] = useState(editData?.showOnHome || false);
+  const [showOnHome, setShowOnHome] = useState(editData?.showOnHome ?? false);
   const [isActive, setIsActive] = useState(editData?.isActive ?? true);
   const [description, setDescription] = useState(editData?.description || "");
-  const [wearTypes, setWearTypes] = useState([]); // list
-  const [selectedWearType, setSelectedWearType] = useState(
-    editData?.wearType?._id || "",
-  );
 
   const [smallimage, setSmallimage] = useState(null);
   const [bannerimage, setBannerimage] = useState(null);
@@ -23,19 +19,6 @@ export default function CategoryModal({ onClose, refresh, editData }) {
   const [bannerImagePreview, setBannerImagePreview] = useState(
     editData?.bannerimage || null,
   );
-  const fetchWearType = async () => {
-    try {
-      const res = await api.get("/wear/type");
-      if (res.data.success) {
-        setWearTypes(res.data.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching wear types:", error);
-    }
-  };
-  useEffect(() => {
-    fetchWearType();
-  }, []);
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -44,10 +27,9 @@ export default function CategoryModal({ onClose, refresh, editData }) {
     if (editData) {
       setName(editData.name || "");
       setDisplayOrder(editData.displayOrder || 0);
-      setShowOnHome(editData.showOnHome || false);
+      setShowOnHome(editData.showOnHome ?? false);
       setIsActive(editData.isActive ?? true);
       setDescription(editData.description || "");
-      setSelectedWearType(editData?.wearType?._id || "");
       setSmallImagePreview(
         editData.smallimage
           ? `${import.meta.env.VITE_BASE_URL}${editData.smallimage}`
@@ -110,7 +92,6 @@ export default function CategoryModal({ onClose, refresh, editData }) {
   // Validate form
   const validateForm = () => {
     const newErrors = {};
-
     if (!name.trim()) {
       newErrors.name = "Category name is required";
     } else if (name.length < 2) {
@@ -118,15 +99,12 @@ export default function CategoryModal({ onClose, refresh, editData }) {
     } else if (name.length > 50) {
       newErrors.name = "Category name must be less than 50 characters";
     }
-    if (!selectedWearType) {
-      newErrors.wearType = "Wear type is required";
-    }
 
     if (displayOrder < 0) {
       newErrors.displayOrder = "Display order cannot be negative";
     }
 
-    if (description && description.length > 500) {
+    if (!description || (description && description.length > 500)) {
       newErrors.description = "Description must be less than 500 characters";
     }
 
@@ -146,7 +124,6 @@ export default function CategoryModal({ onClose, refresh, editData }) {
       fd.append("displayOrder", displayOrder);
       fd.append("showOnHome", showOnHome);
       fd.append("isActive", isActive);
-      fd.append("wearTypeId", selectedWearType);
       if (description) fd.append("description", description);
 
       // Only append new images if they were selected
@@ -204,7 +181,25 @@ export default function CategoryModal({ onClose, refresh, editData }) {
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [onClose]);
-
+  const categoryOptions = [
+    "Top Wear",
+    "Bottom Wear",
+    "Footwear",
+    "Innerwear",
+    "Winter Wear",
+    "Ethnic Wear",
+    "Activewear",
+    "Sportswear",
+    "Sleepwear",
+    "Swimwear",
+    "Accessories",
+    "Plus Size",
+    "Maternity Wear",
+    "Loungewear",
+    "Formal Wear",
+    "Casual Wear",
+    "Party Wear",
+  ];
   return (
     <div
       className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4 backdrop-blur-sm"
@@ -245,42 +240,31 @@ export default function CategoryModal({ onClose, refresh, editData }) {
 
         {/* Form */}
         <div className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {/* WEAR TYPE */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">
-              Wear Type <span className="text-red-500">*</span>
-            </label>
-
-            <select
-              value={selectedWearType}
-              onChange={(e) => setSelectedWearType(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#927f68]"
-            >
-              <option value="">Select Wear Type</option>
-
-              {wearTypes.map((wt) => (
-                <option key={wt._id} value={wt._id}>
-                  {wt.name}
-                </option>
-              ))}
-            </select>
-          </div>
           {/* NAME */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
               Category Name <span className="text-red-500">*</span>
             </label>
-            <input
+
+            <select
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#927f68] focus:border-[#927f68] transition-all ${
                 errors.name ? "border-red-500 bg-red-50" : "border-gray-300"
               }`}
-              placeholder="e.g., Electronics, Fashion, Furniture"
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
                 if (errors.name) setErrors({ ...errors, name: null });
               }}
-            />
+            >
+              <option value="">Select Category</option>
+
+              {categoryOptions.map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+
             {errors.name && (
               <p className="text-sm text-red-500 flex items-center gap-1">
                 <svg
@@ -298,7 +282,6 @@ export default function CategoryModal({ onClose, refresh, editData }) {
               </p>
             )}
           </div>
-
           {/* DESCRIPTION */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
@@ -311,37 +294,53 @@ export default function CategoryModal({ onClose, refresh, editData }) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+            {errors.description && (
+              <p className="text-sm text-red-500 flex items-center gap-1">
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {errors.description}
+              </p>
+            )}
             <p className="text-xs text-gray-500 text-right">
               {description.length}/500 characters
             </p>
           </div>
-
           {/* DISPLAY ORDER */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">
-              Display Order
-            </label>
-            <input
-              type="number"
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#927f68] focus:border-[#927f68] transition-all ${
-                errors.displayOrder
-                  ? "border-red-500 bg-red-50"
-                  : "border-gray-300"
-              }`}
-              placeholder="0"
-              value={displayOrder}
-              onChange={(e) => {
-                setDisplayOrder(parseInt(e.target.value) || 0);
-                if (errors.displayOrder)
-                  setErrors({ ...errors, displayOrder: null });
-              }}
-              min="0"
-            />
-            {errors.displayOrder && (
-              <p className="text-sm text-red-500">{errors.displayOrder}</p>
-            )}
+          <div className="space-y-2 flex justify-between px-2">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700">
+                Display Order
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#927f68] focus:border-[#927f68] transition-all ${
+                  errors.displayOrder
+                    ? "border-red-500 bg-red-50"
+                    : "border-gray-300"
+                }`}
+                placeholder="0"
+                value={displayOrder}
+                onChange={(e) => {
+                  setDisplayOrder(parseInt(e.target.value) || 0);
+                  if (errors.displayOrder)
+                    setErrors({ ...errors, displayOrder: null });
+                }}
+                min="0"
+              />
+              {errors.displayOrder && (
+                <p className="text-sm text-red-500">{errors.displayOrder}</p>
+              )}
+            </div>
           </div>
-
           {/* TOGGLES */}
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
@@ -382,7 +381,6 @@ export default function CategoryModal({ onClose, refresh, editData }) {
               </div>
             )}
           </div>
-
           {/* IMAGES */}
           <div className="space-y-4">
             <h3 className="font-semibold text-gray-700">Category Images</h3>
@@ -435,6 +433,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
                         accept="image/*"
                         onChange={(e) => handleImageChange(e, "small")}
                         className="hidden"
+                        required
                       />
                       <label
                         htmlFor="smallimage"
@@ -512,6 +511,7 @@ export default function CategoryModal({ onClose, refresh, editData }) {
                         accept="image/*"
                         onChange={(e) => handleImageChange(e, "banner")}
                         className="hidden"
+                        required
                       />
                       <label
                         htmlFor="bannerimage"

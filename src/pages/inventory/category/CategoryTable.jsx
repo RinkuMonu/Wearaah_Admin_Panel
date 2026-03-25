@@ -1,20 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import api from "../../../serviceAuth/axios";
 import CategoryModal from "./CategoryModal";
+import { debounce } from "lodash";
 
 export default function CategoryTable() {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const [data, setData] = useState([]);
+  console.log(data)
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchData = async () => {
+  const fetchData = async (search = "") => {
     try {
       setLoading(true);
-      const res = await api.get("/category");
+
+      const res = await api.get("/category", {
+        params: { search },
+      });
+
       setData(res.data.categories || []);
     } catch (error) {
       Swal.fire({
@@ -28,6 +34,13 @@ export default function CategoryTable() {
       setLoading(false);
     }
   };
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value) => {
+        fetchData(value);
+      }, 500),
+    [],
+  );
 
   useEffect(() => {
     fetchData();
@@ -75,11 +88,6 @@ export default function CategoryTable() {
     }
   };
 
-  // Filter data based on search term
-  const filteredData = data.filter((item) =>
-    item.name?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
   return (
     <div className="space-y-4">
       {/* Header Section */}
@@ -87,7 +95,7 @@ export default function CategoryTable() {
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-800">Categories</h2>
           <span className="px-2 py-1 text-xs font-medium bg-[#f5efdd] text-[#927f68] rounded-full">
-            {filteredData.length} Total
+            {data.length} Total
           </span>
         </div>
 
@@ -134,7 +142,11 @@ export default function CategoryTable() {
           type="text"
           placeholder="Search categories..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearchTerm(value);
+            debouncedSearch(value);
+          }}
           className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#927f68] focus:border-transparent transition-all"
         />
       </div>
@@ -148,7 +160,7 @@ export default function CategoryTable() {
             </div>
             <p className="mt-4 text-gray-500">Loading categories...</p>
           </div>
-        ) : filteredData.length === 0 ? (
+        ) : data.length === 0 ? (
           <div className="text-center py-12">
             <svg
               className="w-16 h-16 mx-auto text-gray-400"
@@ -247,7 +259,7 @@ export default function CategoryTable() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredData.map((item, index) => (
+              {data.map((item, index) => (
                 <tr
                   key={item._id}
                   className="hover:bg-gray-50 transition-colors group"
@@ -264,7 +276,7 @@ export default function CategoryTable() {
                         <p className="text-sm font-medium text-gray-900">
                           {item.name}
                         </p>
-                        <p className="text-xs text-[#f5efdd] mt-0.5">
+                        <p className="text-xs text-[#f1c84f] mt-0.5">
                           DisplayOrder {item.displayOrder}
                         </p>
                       </div>
@@ -281,10 +293,10 @@ export default function CategoryTable() {
                     <div className="text-sm text-gray-600">
                       {item.createdAt
                         ? new Date(item.createdAt).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
                         : "N/A"}
                     </div>
                     <div className="text-xs text-gray-400">
@@ -361,10 +373,10 @@ export default function CategoryTable() {
       </div>
 
       {/* Footer */}
-      {!loading && filteredData.length > 0 && (
+      {!loading && data.length > 0 && (
         <div className="flex items-center justify-between text-sm text-gray-600">
           <p>
-            Showing {filteredData.length} of {data.length} categories
+            Showing {data.length} of {data.length} categories
           </p>
           <div className="flex items-center gap-2">
             <button
