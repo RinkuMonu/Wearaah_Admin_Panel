@@ -1,0 +1,31 @@
+export const SIZE_MAP = {
+  Men: ["S", "M", "L", "XL", "XXL", "XXXL"],
+  Women: ["XS", "S", "M", "L", "XL"],
+  Boys: ["2Y", "3Y", "4Y", "5Y", "6Y"],
+  Girls: ["2Y", "3Y", "4Y", "5Y", "6Y"],
+  Kids: ["1Y", "2Y", "3Y", "4Y", "5Y", "6Y"],
+  Unisex: ["S", "M", "L", "XL"],
+};
+
+export const COLOR_OPTIONS = [
+  { name: "Black", hex: "#000000" },
+  { name: "White", hex: "#FFFFFF" },
+  { name: "Red", hex: "#FF0000" },
+  { name: "Blue", hex: "#0000FF" },
+  { name: "Green", hex: "#008000" },
+  { name: "Yellow", hex: "#FFFF00" },
+  { name: "Grey", hex: "#808080" },
+  { name: "Brown", hex: "#8B4513" },
+  { name: "Pink", hex: "#FFC0CB" },
+  { name: "Purple", hex: "#800080" },
+  { name: "Orange", hex: "#FFA500" },
+  { name: "Beige", hex: "#F5F5DC" },
+  { name: "Maroon", hex: "#800000" },
+  { name: "Navy", hex: "#000080" },
+  { name: "Olive", hex: "#808000" },
+  { name: "Teal", hex: "#008080" },
+  { name: "Cream", hex: "#FFFDD0" },
+  { name: "Gold", hex: "#FFD700" },
+  { name: "Silver", hex: "#C0C0C0" },
+  { name: "Multi", hex: "#CCCCCC" },
+];

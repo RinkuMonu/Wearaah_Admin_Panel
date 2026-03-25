@@ -24,7 +24,7 @@ api.interceptors.response.use(
     const code = error?.response?.data?.code;
     const message = error?.response?.data?.message;
 
-    if (status === 401 || code === "FORCE_LOGOUT") {
+    if (status === 401 && code === "FORCE_LOGOUT") {
       Swal.fire({
         title: "Session Expired",
         text: message || "Please login again",
