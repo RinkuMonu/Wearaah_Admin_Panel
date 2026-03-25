@@ -3,7 +3,7 @@ export const SIZE_MAP = {
   Women: ["XS", "S", "M", "L", "XL"],
   Boys: ["2Y", "3Y", "4Y", "5Y", "6Y"],
   Girls: ["2Y", "3Y", "4Y", "5Y", "6Y"],
-  Kids: ["1Y", "2Y", "3Y", "4Y", "5Y", "6Y"],
+  Kids: ["6M", "8M", "10M", "12M", "14M", "16M"],
   Unisex: ["S", "M", "L", "XL"],
 };
 

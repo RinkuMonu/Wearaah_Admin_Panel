@@ -27,14 +27,18 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
   const [form, setForm] = useState({
     variantTitle: "",
     variantDiscription: "",
-    size: "",
     color: "",
-    pricing: {
-      costPrice: "",
-      mrp: "",
-      sellingPrice: "",
-    },
-    stock: "",
+    sizes: [
+      {
+        size: "",
+        stock: "",
+        pricing: {
+          costPrice: "",
+          mrp: "",
+          sellingPrice: "",
+        },
+      },
+    ],
     variantImages: [],
   });
 
@@ -45,9 +49,10 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
 
   /* ---------------- PRICE CALCULATOR ---------------- */
 
-  const sellingPrice = Number(form.pricing.sellingPrice || 0);
-  const costPrice = Number(form.pricing.costPrice || 0);
-  const mrp = Number(form.pricing.mrp || 0);
+  const firstSize = form.sizes[0] || {};
+  const sellingPrice = Number(firstSize?.pricing?.sellingPrice || 0);
+  const costPrice = Number(firstSize?.pricing?.costPrice || 0);
+  const mrp = Number(firstSize?.pricing?.mrp || 0);
 
   const taxableAmount =
     sellingPrice > 0 ? sellingPrice / (1 + taxPercent / 100) : 0;
@@ -159,12 +164,14 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
     if (
       !form.variantTitle ||
       !form.variantDiscription ||
-      !form.size ||
       !form.color ||
-      !form.stock ||
       form.variantImages.length === 0
     ) {
       setError("Please fill in all required fields and add at least 3 image");
+      return;
+    }
+    if (!form.sizes.length || !form.sizes[0].size) {
+      setError("Please add at least one size");
       return;
     }
 
@@ -182,20 +189,20 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
 
       formData.append("variantTitle", form.variantTitle);
       formData.append("variantDiscription", form.variantDiscription);
-      formData.append("size", form.size);
+      formData.append("sizes", JSON.stringify(form.sizes));
       formData.append("color", form.color);
 
-      formData.append(
-        "pricing",
-        JSON.stringify({
-          costPrice: Number(form.pricing.costPrice) || 0,
-          mrp: Number(form.pricing.mrp) || 0,
-          sellingPrice: Number(form.pricing.sellingPrice) || 0,
-          taxPercent,
-        }),
-      );
+      // formData.append(
+      //   "pricing",
+      //   JSON.stringify({
+      //     costPrice: Number(form.pricing.costPrice) || 0,
+      //     mrp: Number(form.pricing.mrp) || 0,
+      //     sellingPrice: Number(form.pricing.sellingPrice) || 0,
+      //     taxPercent,
+      //   }),
+      // );
 
-      formData.append("stock", form.stock);
+      // formData.append("stock", form.stock);
 
       form.variantImages.forEach((file) => {
         formData.append("variantImages", file);
@@ -273,28 +280,6 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                      <Ruler className="w-4 h-4" />
-                      Size <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="size"
-                      value={form.size}
-                      onChange={handleChange}
-                      onBlur={() => handleBlur("size")}
-                      required
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none bg-white"
-                    >
-                      <option value="">Select Size</option>
-                      {sizeOptions.map((size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <Palette className="w-4 h-4" />
                       Color <span className="text-red-500">*</span>
                     </label>
@@ -324,9 +309,127 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
                     </div>
                   </div>
                 </div>
+                <div className="space-y-4">
+                  <label className="text-sm font-medium">
+                    Sizes + Pricing + Stock
+                  </label>
+
+                  {form.sizes.map((item, index) => (
+                    <div
+                      key={index}
+                      className="border p-3 rounded-lg space-y-2 grid grid-cols-3 gap-3"
+                    >
+                      {/* SIZE */}
+                      <select
+                        value={item.size}
+                        className="border border-gray-300 rounded-lg px-4 py-2.5"
+                        onChange={(e) => {
+                          const updated = [...form.sizes];
+                          updated[index].size = e.target.value;
+                          setForm({ ...form, sizes: updated });
+                        }}
+                        required
+                      >
+                        <option value="">Select Size</option>
+                        {sizeOptions.map((s) => (
+                          <option key={s}>{s}</option>
+                        ))}
+                      </select>
+
+                      {/* COST */}
+                      <input
+                        className="border p-3 rounded-lg space-y-2"
+                        placeholder="Cost Price"
+                        value={item.pricing.costPrice}
+                        onChange={(e) => {
+                          const updated = [...form.sizes];
+                          updated[index].pricing.costPrice = e.target.value;
+                          setForm({ ...form, sizes: updated });
+                        }}
+                        required
+                      />
+                      {/* MRP */}
+                      <input
+                        placeholder="MRP"
+                        className="border p-3 rounded-lg space-y-2"
+                        value={item.pricing.mrp}
+                        onChange={(e) => {
+                          const updated = [...form.sizes];
+                          updated[index].pricing.mrp = e.target.value;
+                          setForm({ ...form, sizes: updated });
+                        }}
+                        required
+                      />
+
+                      {/* SELLING */}
+                      <input
+                        placeholder="Selling Price"
+                        className="border p-3 rounded-lg space-y-2"
+                        value={item.pricing.sellingPrice}
+                        onChange={(e) => {
+                          const updated = [...form.sizes];
+                          updated[index].pricing.sellingPrice = e.target.value;
+                          setForm({ ...form, sizes: updated });
+                        }}
+                        required
+                      />
+
+                      {/* STOCK */}
+                      <input
+                        type="number"
+                        placeholder="Stock"
+                        className="border p-3 rounded-lg space-y-2"
+                        value={item.stock}
+                        onChange={(e) => {
+                          const updated = [...form.sizes];
+                          updated[index].stock = e.target.value;
+                          setForm({ ...form, sizes: updated });
+                        }}
+                        required
+                      />
+
+                      {/* REMOVE BUTTON */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = form.sizes.filter(
+                            (_, i) => i !== index,
+                          );
+                          setForm({ ...form, sizes: updated });
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* ADD BUTTON */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm({
+                        ...form,
+                        sizes: [
+                          ...form.sizes,
+                          {
+                            size: "",
+                            stock: "",
+                            pricing: {
+                              costPrice: "",
+                              mrp: "",
+                              sellingPrice: "",
+                            },
+                          },
+                        ],
+                      })
+                    }
+                  >
+                    + Add Size
+                  </button>
+                </div>
 
                 {/* Price Fields */}
-                <div className="grid grid-cols-3 gap-4">
+                {/* <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                       <DollarSign className="w-4 h-4" />
@@ -406,10 +509,10 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
                       </p>
                     )}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Stock Field */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <Package className="w-4 h-4" />
                     Stock Quantity <span className="text-red-500">*</span>
@@ -426,7 +529,7 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
                     step="1"
                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
-                </div>
+                </div> */}
 
                 {/* Image Upload */}
                 <div className="space-y-3">
@@ -537,7 +640,9 @@ export default function AddVariantModal({ product, onClose, onSubmit }) {
 
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Selling Price <span>(Incl.Tax)</span></span>
+                    <span className="text-gray-600">
+                      Selling Price <span>(Incl.Tax)</span>
+                    </span>
                     <span className="font-medium">
                       ₹{sellingPrice.toFixed(2)}
                     </span>

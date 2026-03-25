@@ -21,6 +21,7 @@ import { useEffect } from "react";
 import GlobalOrderAlert from "./Config/GlobalOrderAlert";
 import SellerStepper from "./pages/SellerStepperForm/SellerStepper";
 import SellerList from "./pages/UserManagement/seller";
+import VariantStockManagement from "./pages/inventory/stock/variantStockManage";
 
 function App() {
   useEffect(() => {
@@ -48,6 +49,7 @@ function App() {
                 <Route path="subcategory" element={<SubCategoryPage />} />
                 <Route path="leadwehave" element={<LeadsPage />} />
                 <Route path="SellerManagementTable" element={<SellerList />} />
+                <Route path="Variant/Stock/Management" element={<VariantStockManagement />} />
               </Route>
               <Route element={<RoleProtectedRoute allowedRoles={["seller"]} />}>
                 {/* nothing */}
