@@ -33,6 +33,19 @@ export const menuItems = [
       // { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
     ],
   },
+  {
+    name: "QC Management",
+    icon: User2,
+    roles: ["superadmin", "`seller`"],
+    submenu: [
+      {
+        name: "Variant QC",
+        path: "/qCProducts",
+        roles: ["superadmin", "seller"],
+      },
+      // { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
+    ],
+  },
 
   {
     name: "Inventory",
