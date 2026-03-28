@@ -22,6 +22,7 @@ import GlobalOrderAlert from "./Config/GlobalOrderAlert";
 import SellerStepper from "./pages/SellerStepperForm/SellerStepper";
 import SellerList from "./pages/UserManagement/seller";
 import VariantStockManagement from "./pages/inventory/stock/variantStockManage";
+import WalletTransactions from "./pages/Report/WalletTransactions";
 
 function App() {
   useEffect(() => {
@@ -66,6 +67,7 @@ function App() {
                 <Route path="odersPage" element={<OrdersPage />} />
                 <Route path="contact" element={<ContactPage />} />
                 <Route path="quickbilling" element={<QuickBilling />} />
+                <Route path="wallettransactions" element={<WalletTransactions />} />
               </Route>
             </Route>
           </Route>

@@ -76,14 +76,14 @@ export default function ProductPage() {
 
       setCategories(catRes.data.categories || []);
       // setSubCategories(subRes.data.categories || []);
-      setBrands(brandRes.data.brands || []);
+      setBrands(brandRes.data?.data || []);
     } catch (err) {
       console.error("Filter data error", err);
     }
   };
 
   // Fetch products on component mount
-  const fetchProducts = async () => {
+  const fetchProducts = async (searchValue = searchTerm) => {
     setLoading(true);
 
     try {
@@ -91,8 +91,9 @@ export default function ProductPage() {
         page: currentPage,
         limit: rowsPerPage,
       };
+      console.log(params);
 
-      if (searchTerm) params.search = searchTerm;
+      if (searchValue) params.search = searchValue;
       if (category !== "All") params.category = category;
       if (subCategory !== "All") params.subCategory = subCategory;
       if (brand !== "All") params.brand = brand;
@@ -117,10 +118,11 @@ export default function ProductPage() {
 
   const debouncedSearch = useMemo(
     () =>
-      debounce(() => {
-        fetchProducts();
+      debounce((value) => {
+        setCurrentPage(1);
+        fetchProducts(value);
       }, 500),
-    [searchTerm],
+    [],
   );
 
   useEffect(() => {
@@ -193,7 +195,11 @@ export default function ProductPage() {
       throw error;
     }
   };
-
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, []);
   return (
     <>
       <div className="p-6 min-h-screen">
@@ -215,25 +221,24 @@ export default function ProductPage() {
             {/* Left Buttons */}
 
             <div className="relative  justify-center items-center gap-1">
-              <div>
-                <Search
-                  size={16}
-                  className="absolute left-3 top-3 text-gray-400"
-                />
-                <input
-                  type="text"
-                  placeholder="Search List..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    debouncedSearch();
-                  }}
-                  className="pl-9 pr-4  py-2 border rounded-md text-sm w-72 focus:outline-none focus:border-gray-400"
-                />
-              </div>
-
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 mt-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 mt-4 gap-4">
+                <div className="relative">
+                  <Search
+                    size={16}
+                    className="absolute left-3 top-8 text-gray-400"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search List..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSearchTerm(value);
+                      debouncedSearch(value);
+                    }}
+                    className="pl-9 pr-4 mt-6 py-2 border rounded-md text-sm w-72 focus:outline-none focus:border-gray-400"
+                  />
+                </div>
                 <CustomSelect
                   label="Category"
                   options={[
@@ -259,67 +264,17 @@ export default function ProductPage() {
                   value={brand}
                   onChange={setBrand}
                 />
-
-                {/* <CustomSelect
-                  label="Purchase Tax"
-                  options={["GST", "GST 0"]}
-                  value={purchaseTax}
-                  onChange={setPurchaseTax}
-                /> */}
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    From MRP
-                  </label>
-                  <input
-                    type="number"
-                    value={fromMrp}
-                    onChange={(e) => setFromMrp(e.target.value)}
-                    placeholder="0"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
-                  />
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="flex items-center mt-5 gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm"
+                  >
+                    <Plus size={16} />
+                    Create New
+                  </button>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    To MRP
-                  </label>
-                  <input
-                    type="number"
-                    value={toMrp}
-                    onChange={(e) => setToMrp(e.target.value)}
-                    placeholder="0"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
-                  />
-                </div>
-                  <div className="flex items-center gap-3">
-              {/* <select className="border border-gray-300 rounded-md px-3 py-2 text-sm">
-                <option>50</option>
-                <option>100</option>
-                <option>200</option>
-              </select> */}
-              {/* <button
-                onClick={() => setShowFilter((prev) => !prev)}
-                className="flex items-center gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm"
-              >
-                <Filter size={16} />
-                Filter
-              </button> */}
-
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="flex items-center mt-5 gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm"
-              >
-                <Plus size={16} />
-                Create New
-              </button>
-            </div>
               </div>
-              
             </div>
-            
-
-          
           </div>
 
           {/* PRODUCT TABLE */}

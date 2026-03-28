@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import api from "../../../serviceAuth/axios";
+import { VariantViewModal } from "./VariantViewModal";
 
 export default function VariantStockManagement() {
   const [variants, setVariants] = useState([]);
@@ -58,9 +59,11 @@ export default function VariantStockManagement() {
   // Pagination
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalVariants, setTotalVariants] = useState(0);
+  const [totalVariants, setTotalVariant] = useState(1);
+  const [stats, setStats] = useState({});
   const [limit, setLimit] = useState(10);
-
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   // Selected variants for bulk update
   const [selectedVariants, setSelectedVariants] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -86,7 +89,8 @@ export default function VariantStockManagement() {
       if (res.data.success) {
         setVariants(res.data.variants || []);
         setTotalPages(res.data.totalPages || 1);
-        setTotalVariants(res.data.totalVariants || 0);
+        setTotalVariant(res.data.totalVariants || 0);
+        setStats(res.data?.stats);
 
         // Initialize stock values
         const stockValues = {};
@@ -115,12 +119,7 @@ export default function VariantStockManagement() {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [
-    filters.search,
-    filters.size,
-    filters.minPrice,
-    filters.maxPrice,
-  ]);
+  }, [filters.search, filters.size, filters.minPrice, filters.maxPrice]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -150,15 +149,14 @@ export default function VariantStockManagement() {
       return;
     }
 
-    setLoading(true);
     try {
-      const res = await api.put(`/variant/${variantId}`, {
-        variantTitle: variant.variantTitle,
-        variantDiscription: variant.variantDiscription,
-        size: variant.size,
-        color: variant.color,
-        pricing: variant.pricing,
-        stock: newStock,
+      const res = await api.put(`/variant/bulkstockupdate`, {
+        variants: [
+          {
+            id: variantId,
+            stock: Number(newStock),
+          },
+        ],
       });
 
       if (res.data.success) {
@@ -167,7 +165,9 @@ export default function VariantStockManagement() {
             v._id === variantId ? { ...v, stock: newStock } : v,
           ),
         );
+
         Swal.fire("Success", "Stock updated successfully", "success");
+        fetchVariants();
       }
     } catch (err) {
       Swal.fire(
@@ -175,9 +175,7 @@ export default function VariantStockManagement() {
         err.response?.data?.message || "Failed to update stock",
         "error",
       );
-      setStockValue((prev) => ({ ...prev, [variantId]: variant.stock }));
     } finally {
-      setLoading(false);
       setEditingStock(null);
     }
   };
@@ -210,19 +208,14 @@ export default function VariantStockManagement() {
     if (bulkStock !== null && bulkStock >= 0) {
       setLoading(true);
       try {
-        const promises = selectedVariants.map((variantId) => {
-          const variant = variants.find((v) => v._id === variantId);
-          return api.put(`/variant/${variantId}`, {
-            variantTitle: variant.variantTitle,
-            variantDiscription: variant.variantDiscription,
-            size: variant.size,
-            pricing: variant.pricing,
-            stock: Number(bulkStock),
-          });
+        const payload = selectedVariants.map((variantId) => ({
+          id: variantId,
+          stock: Number(bulkStock),
+        }));
+
+        await api.put(`/variant/bulkstockupdate`, {
+          variants: payload,
         });
-
-        await Promise.all(promises);
-
         setVariants((prev) =>
           prev.map((v) =>
             selectedVariants.includes(v._id)
@@ -238,6 +231,7 @@ export default function VariantStockManagement() {
           `Stock updated for ${selectedVariants.length} variant(s)`,
           "success",
         );
+        fetchVariants();
       } catch (err) {
         Swal.fire("Error", "Failed to update some variants", "error");
       } finally {
@@ -335,18 +329,6 @@ export default function VariantStockManagement() {
     }
   };
 
-  const stats = useMemo(() => {
-    const total = variants.length;
-    const lowStock = variants.filter((v) => v.stock > 0 && v.stock <= 5).length;
-    const outOfStock = variants.filter((v) => v.stock === 0).length;
-    const inStock = variants.filter((v) => v.stock > 5).length;
-    const pendingQC = variants.filter(
-      (v) => v.status === "pending" && v.isActive,
-    ).length;
-
-    return { total, lowStock, outOfStock, inStock, pendingQC };
-  }, [variants]);
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -381,7 +363,7 @@ export default function VariantStockManagement() {
             )}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <FilterIcon className="w-4 h-4" />
               Filters
@@ -400,7 +382,7 @@ export default function VariantStockManagement() {
               title="Refresh"
             >
               <RefreshCw
-                className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+                className={`w-5 h-5  cursor-pointer ${loading ? "animate-spin" : ""}`}
               />
             </button>
           </div>
@@ -489,7 +471,7 @@ export default function VariantStockManagement() {
               onClick={() => setShowFilters(false)}
               className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-gray-500 cursor-pointer" />
             </button>
           </div>
 
@@ -504,7 +486,7 @@ export default function VariantStockManagement() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Title, SKU, HSN..."
+                    placeholder="Variant Title, SKU..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.search}
                     onChange={(e) =>
@@ -515,7 +497,7 @@ export default function VariantStockManagement() {
               </div>
 
               {/* Size */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Size
                 </label>
@@ -529,7 +511,7 @@ export default function VariantStockManagement() {
                     onChange={(e) => handleFilterChange("size", e.target.value)}
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Status */}
               <div>
@@ -537,7 +519,7 @@ export default function VariantStockManagement() {
                   Status
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
                   value={filters.status}
                   onChange={(e) => handleFilterChange("status", e.target.value)}
                 >
@@ -600,7 +582,7 @@ export default function VariantStockManagement() {
                     }
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700 cursor-pointer">
                     Show Low Stock (≤5)
                   </span>
                 </label>
@@ -612,7 +594,7 @@ export default function VariantStockManagement() {
                   Sort By
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
                   value={filters.sort}
                   onChange={(e) => handleFilterChange("sort", e.target.value)}
                 >
@@ -629,7 +611,7 @@ export default function VariantStockManagement() {
             <div className="flex justify-end mt-4">
               <button
                 onClick={resetFilters}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -656,7 +638,7 @@ export default function VariantStockManagement() {
                     type="checkbox"
                     checked={selectAll}
                     onChange={handleSelectAll}
-                    className="rounded text-blue-600 focus:ring-blue-500"
+                    className="rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -720,9 +702,9 @@ export default function VariantStockManagement() {
                         <p className="font-medium text-gray-900">
                           {variant.productId?.name || "N/A"}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        {/* <p className="text-xs text-gray-500">
                           ID: {variant.productId?._id?.slice(-6)}
-                        </p>
+                        </p> */}
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -815,14 +797,12 @@ export default function VariantStockManagement() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() =>
-                          window.open(
-                            `/product/${variant.productId?._id}`,
-                            "_blank",
-                          )
-                        }
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="View product"
+                        onClick={() => {
+                          setSelectedVariant(variant);
+                          setShowViewModal(true);
+                        }}
+                        title="View More"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -947,6 +927,12 @@ export default function VariantStockManagement() {
           </div>
         </div>
       )}
+
+      <VariantViewModal
+        show={showViewModal}
+        onClose={() => setShowViewModal(false)}
+        variant={selectedVariant}
+      />
     </div>
   );
 }
