@@ -8,6 +8,7 @@ import {
   User2,
   UserCheck2,
   Users,
+  Wallet,
   WeightTilde,
 } from "lucide-react";
 
@@ -84,6 +85,12 @@ export const menuItems = [
     name: "Lead We Have",
     path: "/leadwehave",
     icon: UserCheck2,
+    roles: ["superadmin"],
+  },
+  {
+    name: "Wallet Report",
+    path: "/wallettransactions",
+    icon: Wallet,
     roles: ["superadmin"],
   },
   {
