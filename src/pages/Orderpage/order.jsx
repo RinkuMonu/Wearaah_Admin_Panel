@@ -25,6 +25,7 @@ import {
   PackageX,
   ShoppingBag,
   Loader2,
+  PackageCheckIcon,
 } from "lucide-react";
 import api from "../../serviceAuth/axios";
 import Swal from "sweetalert2";
@@ -32,10 +33,10 @@ import { useAuth } from "../../serviceAuth/context";
 
 export const OrdersPage = () => {
   const { user, setUnseenCount, unseenCount } = useAuth();
-  let userId = user.user?._id;
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   // Filters
   const [search, setSearch] = useState("");
   const [orderStatus, setOrderStatus] = useState("");
@@ -50,9 +51,31 @@ export const OrdersPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [limit, setLimit] = useState(10);
 
+  // Backend stats
+  const [stats, setStats] = useState({
+    lockedAmount: 0,
+    deliveredAmount: 0,
+    deliveredCount: 0,
+    cancelledCount: 0,
+    returnedCount: 0,
+    totalAmount: 0,
+    totalCount: 0,
+  });
+
   // Selected order for details view
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+
+  // Debounce search
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -61,7 +84,7 @@ export const OrdersPage = () => {
       const params = {
         page,
         limit,
-        orderNumber: search || undefined,
+        orderNumber: debouncedSearch || undefined,
         orderStatus: orderStatus || undefined,
         settlementStatus: settlementStatus || undefined,
         paymentMethod: paymentMethod || undefined,
@@ -69,12 +92,23 @@ export const OrdersPage = () => {
         dateTo: dateRange.to || undefined,
       };
 
-      const res = await api.get("/order/my", { params });
+      const res = await api.get("/order/myAll", { params });
 
       if (res.data.success) {
         setOrders(res.data.orders || []);
         setTotalPages(res.data.totalPages || 1);
         setTotalCount(res.data.totalCount || 0);
+        setStats(
+          res.data.stats || {
+            lockedAmount: 0,
+            deliveredAmount: 0,
+            deliveredCount: 0,
+            cancelledCount: 0,
+            returnedCount: 0,
+            totalAmount: 0,
+            totalCount: 0,
+          },
+        );
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch orders");
@@ -83,6 +117,7 @@ export const OrdersPage = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (unseenCount > 0) {
       const markSeen = async () => {
@@ -99,12 +134,16 @@ export const OrdersPage = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [page, limit, orderStatus, settlementStatus, paymentMethod]);
-
-  const handleSearch = () => {
-    setPage(1);
-    fetchOrders();
-  };
+  }, [
+    page,
+    limit,
+    debouncedSearch,
+    orderStatus,
+    settlementStatus,
+    paymentMethod,
+    dateRange.from,
+    dateRange.to,
+  ]);
 
   const resetFilters = () => {
     setSearch("");
@@ -220,6 +259,15 @@ export const OrdersPage = () => {
     });
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {/* Header */}
@@ -261,16 +309,31 @@ export const OrdersPage = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        {/* Stats Cards - Using Backend Calculated Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Total Orders</p>
-                <p className="text-2xl font-bold text-gray-800">{totalCount}</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {stats.totalCount}
+                </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <ShoppingBag className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Revenue</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {formatCurrency(stats.totalAmount)}
+                </p>
+              </div>
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <IndianRupee className="w-5 h-5 text-purple-600" />
               </div>
             </div>
           </div>
@@ -278,10 +341,13 @@ export const OrdersPage = () => {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Delivered</p>
+                <p className="text-sm text-gray-500">Upcoming Amount</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {orders.filter((o) => o.orderStatus === "delivered").length}
+                  {formatCurrency(stats.lockedAmount)}
                 </p>
+                {/* <p className="text-xs text-gray-500 mt-1">
+                  {formatCurrency(stats.deliveredAmount)}
+                </p> */}
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
                 <CheckCircle className="w-5 h-5 text-green-600" />
@@ -292,37 +358,26 @@ export const OrdersPage = () => {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">
-                  {
-                    orders.filter(
-                      (o) =>
-                        o.orderStatus === "placed" ||
-                        o.orderStatus === "packed" ||
-                        o.orderStatus === "shipped",
-                    ).length
-                  }
+                <p className="text-sm text-gray-500">Delivered</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {stats.deliveredCount}
                 </p>
               </div>
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <Clock className="w-5 h-5 text-yellow-600" />
+              <div className="p-3 bg-green-100 rounded-lg">
+                <PackageCheckIcon className="w-5 h-5 text-green-600" />
               </div>
             </div>
           </div>
-
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Revenue</p>
-                <p className="text-2xl font-bold text-purple-600">
-                  ₹
-                  {orders
-                    .reduce((sum, o) => sum + (o.totalAmount || 0), 0)
-                    .toLocaleString()}
+                <p className="text-sm text-gray-500">Cancelled</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {stats.cancelledCount}
                 </p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <IndianRupee className="w-5 h-5 text-purple-600" />
+              <div className="p-3 bg-red-100 rounded-lg">
+                <XCircle className="w-5 h-5 text-red-600" />
               </div>
             </div>
           </div>
@@ -353,7 +408,7 @@ export const OrdersPage = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Order number"
+                    placeholder="Order number, product name..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -447,7 +502,7 @@ export const OrdersPage = () => {
               {/* Actions */}
               <div className="flex items-end gap-2">
                 <button
-                  onClick={handleSearch}
+                  onClick={() => setPage(1)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Apply Filters
@@ -481,7 +536,7 @@ export const OrdersPage = () => {
                   Order #
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
+                  Seller
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Items
@@ -539,10 +594,10 @@ export const OrdersPage = () => {
                     <td className="px-4 py-3">
                       <div>
                         <p className="font-medium text-gray-900">
-                          {order.shippingAddress?.fullName || "N/A"}
+                          {order.seller?.shopName || "N/A"}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {order.shippingAddress?.mobile}
+                          {order.seller?.businessType || "N/A"}
                         </p>
                       </div>
                     </td>
@@ -556,11 +611,11 @@ export const OrdersPage = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span className="font-medium text-gray-900">
-                        ₹{order.totalAmount?.toLocaleString()}
+                        {formatCurrency(order.totalAmount)}
                       </span>
                       {order.deliveryCharge > 0 && (
                         <p className="text-xs text-gray-500">
-                          +₹{order.deliveryCharge} delivery
+                          +{formatCurrency(order.deliveryCharge)} delivery
                         </p>
                       )}
                     </td>
@@ -598,7 +653,7 @@ export const OrdersPage = () => {
         </div>
 
         {/* Pagination */}
-        {orders.length > 0 && (
+        {totalCount > 0 && (
           <div className="px-4 py-3 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-700">
@@ -725,34 +780,33 @@ export const OrdersPage = () => {
                     </div>
                   </div>
 
-                  {/* Shipping Address */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-semibold text-gray-800 mb-3">
-                      Shipping Address
-                    </h4>
-                    <div className="space-y-2">
-                      <p className="font-medium text-gray-900">
-                        {selectedOrder.shippingAddress?.fullName}
-                      </p>
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Phone className="w-3 h-3" />
-                        <span>{selectedOrder.shippingAddress?.mobile}</span>
-                      </div>
-                      <div className="flex items-start gap-1 text-sm text-gray-600">
-                        <MapPin className="w-3 h-3 mt-1 flex-shrink-0" />
-                        <span>
-                          {selectedOrder.shippingAddress?.street}
-                          {selectedOrder.shippingAddress?.landmark &&
-                            `, ${selectedOrder.shippingAddress?.landmark}`}
-                          <br />
-                          {selectedOrder.shippingAddress?.city},{" "}
-                          {selectedOrder.shippingAddress?.state}
-                          <br />
-                          {selectedOrder.shippingAddress?.pincode}
-                        </span>
+                  {/* Seller Information */}
+                  {selectedOrder.seller && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-800 mb-3">
+                        Seller Information
+                      </h4>
+                      <div className="space-y-2">
+                        <p className="font-medium text-gray-900">
+                          {selectedOrder.seller.shopName}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Business: {selectedOrder.seller.businessType}
+                        </p>
+                        {selectedOrder.seller.pickupDelivery && (
+                          <div className="flex items-start gap-1 text-sm text-gray-600">
+                            <MapPin className="w-3 h-3 mt-1 flex-shrink-0" />
+                            <span>
+                              {selectedOrder.seller.pickupDelivery.street},
+                              {selectedOrder.seller.pickupDelivery.city},
+                              {selectedOrder.seller.pickupDelivery.state} -{" "}
+                              {selectedOrder.seller.pickupDelivery.pincode}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Price Breakdown */}
@@ -765,20 +819,28 @@ export const OrdersPage = () => {
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Total Amount:</span>
                         <span className="font-medium">
-                          ₹{selectedOrder.totalAmount?.toLocaleString()}
+                          {formatCurrency(selectedOrder.totalAmount)}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Delivery Charge:</span>
                         <span className="font-medium">
-                          ₹{selectedOrder.deliveryCharge?.toLocaleString()}
+                          {formatCurrency(selectedOrder.deliveryCharge)}
                         </span>
                       </div>
                       {selectedOrder.coinUsed > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Coins Used:</span>
                           <span className="font-medium text-green-600">
-                            -₹{selectedOrder.coinUsed}
+                            -{formatCurrency(selectedOrder.coinUsed)}
+                          </span>
+                        </div>
+                      )}
+                      {selectedOrder.walletUsed > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Wallet Used:</span>
+                          <span className="font-medium text-green-600">
+                            -{formatCurrency(selectedOrder.walletUsed)}
                           </span>
                         </div>
                       )}
@@ -786,8 +848,9 @@ export const OrdersPage = () => {
                         <div className="flex justify-between font-semibold">
                           <span>Final Amount:</span>
                           <span className="text-blue-600">
-                            ₹
-                            {selectedOrder.finalAmoutAfterCoinDeliverycharges?.toLocaleString()}
+                            {formatCurrency(
+                              selectedOrder.finalAmoutAfterCoinDeliverycharges,
+                            )}
                           </span>
                         </div>
                       </div>
@@ -796,17 +859,44 @@ export const OrdersPage = () => {
                           Platform Commission:
                         </span>
                         <span className="font-medium text-orange-600">
-                          -₹{selectedOrder.platformCommission?.toLocaleString()}
+                          -{formatCurrency(selectedOrder.platformCommission)}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm font-semibold">
                         <span>Your Earnings:</span>
                         <span className="text-green-600">
-                          ₹{selectedOrder.sellerAmount?.toLocaleString()}
+                          {formatCurrency(selectedOrder.sellerAmount)}
                         </span>
                       </div>
+                      {selectedOrder.refundAmount > 0 && (
+                        <div className="flex justify-between text-sm text-red-600">
+                          <span>Refund Amount:</span>
+                          <span className="font-medium">
+                            {formatCurrency(selectedOrder.refundAmount)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
+
+                  {/* Cancellation/Refund Info */}
+                  {selectedOrder.orderStatus === "cancelled" && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <h4 className="font-semibold text-red-800 mb-2">
+                        Cancellation Details
+                      </h4>
+                      {selectedOrder.cancelReason && (
+                        <p className="text-sm text-red-700">
+                          Reason: {selectedOrder.cancelReason}
+                        </p>
+                      )}
+                      {selectedOrder.refundedAt && (
+                        <p className="text-sm text-red-700 mt-1">
+                          Refunded on: {formatDate(selectedOrder.refundedAt)}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -859,18 +949,18 @@ export const OrdersPage = () => {
                           </td>
                           <td className="px-4 py-3 text-right">
                             <span className="text-gray-600 line-through text-xs">
-                              ₹{item.mrp}
+                              {formatCurrency(item.mrp)}
                             </span>
                             <br />
                             <span className="font-medium">
-                              ₹{item.sellingPrice}
+                              {formatCurrency(item.sellingPrice)}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-right">
                             {item.quantity}
                           </td>
                           <td className="px-4 py-3 text-right font-medium">
-                            ₹{item.totalAmountofqty}
+                            {formatCurrency(item.totalAmountofqty)}
                           </td>
                         </tr>
                       ))}

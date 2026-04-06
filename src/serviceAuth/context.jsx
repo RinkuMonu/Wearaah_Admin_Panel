@@ -8,10 +8,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [unseenCount, setUnseenCount] = useState(0);
+  const [walletAmount, setWalletAmount] = useState(0);
   const [token, setTokenState] = useState(
     localStorage.getItem("authToken") || null,
   );
   const [user, setUser] = useState(null);
+  const [sellerData, setSellerData] = useState(null);
 
   const setToken = (newToken) => {
     if (newToken) {
@@ -23,8 +25,6 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     }
   };
-
-  // ✅ FETCH PROFILE
   const fetchProfile = async () => {
     if (!token) return;
 
@@ -33,6 +33,18 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data);
     } catch (err) {
       console.error("Failed to fetch user:", err);
+      setToken(null);
+    }
+  };
+  const fetchSellerData = async () => {
+    if (!token) return;
+
+    try {
+      const res = await api.get("/auth/seller/me");
+      // console.log("Seller Data:", res.data);
+      setSellerData(res.data);
+    } catch (err) {
+      console.error("Failed to fetch seller data:", err);
       setToken(null);
     }
   };
@@ -56,7 +68,11 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     fetchProfile();
+    if (user && user?.user?.role === "seller") {
+      fetchSellerData();
+    }
   }, [token]);
+
   const fetchMissedOrders = async () => {
     try {
       const res = await api.get("/order/unseen");
@@ -80,14 +96,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!user?.user?._id) return;
-    fetchMissedOrders();
+    if (user && user?.user?.role == "seller" && !user?.user?._id) {
+      fetchMissedOrders();
+    }
   }, [user]);
+
   useEffect(() => {
     if (!token) {
       disconnectSocket();
     }
   }, [token]);
+
+  const fetchWallet = async () => {
+    if (!token) return;
+    try {
+      const res = await api.get("/auth/get/wallet");
+      setWalletAmount(res.data?.availableBalance || 0);
+    } catch (error) {
+      console.log("wallet getting", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWallet();
+  }, []);
   return (
     <AuthContext.Provider
       value={{
@@ -95,9 +127,13 @@ export const AuthProvider = ({ children }) => {
         token,
         setToken,
         setUser,
+        fetchProfile,
         setUnseenCount,
+        sellerData,
         unseenCount,
         fetchMissedOrders,
+        fetchWallet,
+        walletAmount,
       }}
     >
       {children}

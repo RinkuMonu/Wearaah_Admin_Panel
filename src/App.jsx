@@ -4,7 +4,6 @@ import Dashboard from "./pages/dashboard";
 import ProductPage from "./pages/inventory/product/Product";
 import StockPage from "./pages/inventory/Stock";
 import CategorySection from "./pages/inventory/Category&Brand";
-import ProfilePage from "./pages/Profile";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import { ProtectedRoute, PublicRoute } from "./serviceAuth/protectRoute";
@@ -24,6 +23,10 @@ import SellerList from "./pages/UserManagement/seller";
 import VariantStockManagement from "./pages/inventory/stock/variantStockManage";
 import QCProductsList from "./pages/QcProducts/QcProducts";
 import WalletTransactions from "./pages/Report/WalletTransactions";
+import WithdrawalRequests from "./pages/WithdrawalRequests/WithdrawalRequests";
+import UserProfile from "./pages/Profile/basic";
+import ProfilePage from "./pages/Profile/Profile";
+import RiderList from "./pages/UserManagement/rider";
 
 function App() {
   useEffect(() => {
@@ -51,7 +54,11 @@ function App() {
                 <Route path="subcategory" element={<SubCategoryPage />} />
                 <Route path="leadwehave" element={<LeadsPage />} />
                 <Route path="SellerManagementTable" element={<SellerList />} />
-                <Route path="Variant/Stock/Management" element={<VariantStockManagement />} />
+                <Route path="riderManagementTable" element={<RiderList />} />
+                <Route
+                  path="Variant/Stock/Management"
+                  element={<VariantStockManagement />}
+                />
               </Route>
               <Route element={<RoleProtectedRoute allowedRoles={["seller"]} />}>
                 {/* nothing */}
@@ -69,7 +76,15 @@ function App() {
                 <Route path="contact" element={<ContactPage />} />
                 <Route path="quickbilling" element={<QuickBilling />} />
                 <Route path="qCProducts" element={<QCProductsList />} />
-                <Route path="wallettransactions" element={<WalletTransactions />} />
+                <Route
+                  path="wallettransactions"
+                  element={<WalletTransactions />}
+                />
+                <Route
+                  path="withdrawal/requests"
+                  element={<WithdrawalRequests />}
+                />
+                <Route path="test" element={<UserProfile />} />
               </Route>
             </Route>
           </Route>

@@ -152,7 +152,7 @@ export default function Dashboard() {
 const stats = [
   {
     title: "Total Sales",
-    value: `₹${totalSales}`,
+    value: `₹200`,
     icon: IndianRupee,
     color: "bg-emerald-100",
   },
@@ -510,19 +510,19 @@ return (
         {[
           {
             name: "Neptune Longsleeve",
-            price: "$138",
+            price: "138",
             sales: 952,
             img: "https://i.pravatar.cc/50?img=1",
           },
           {
             name: "Ribbed Tank Top",
-            price: "$108",
+            price: "108",
             sales: 902,
             img: "https://i.pravatar.cc/50?img=2",
           },
           {
             name: "Oversized Motif T",
-            price: "$98",
+            price: "98",
             sales: 882,
             img: "https://i.pravatar.cc/50?img=3",
           },

@@ -69,14 +69,15 @@ export default function ProductPage() {
 
   const fetchFilters = async () => {
     try {
-      const [catRes, brandRes] = await Promise.all([
+      const [catRes, brandRes, subcategory] = await Promise.all([
         api.get("/category/nameonly"),
         api.get("/brand/nameonly"),
+        api.get("/subcategory/nameonly"),
       ]);
-
+      console.log("Categories:", subcategory.data.categories);
       setCategories(catRes.data.categories || []);
-      // setSubCategories(subRes.data.categories || []);
-      setBrands(brandRes.data?.data || []);
+      setBrands(brandRes.data.brands || []);
+      setSubCategories(subcategory.data.categories || []);
     } catch (err) {
       console.error("Filter data error", err);
     }
@@ -91,7 +92,6 @@ export default function ProductPage() {
         page: currentPage,
         limit: rowsPerPage,
       };
-      console.log(params);
 
       if (searchValue) params.search = searchValue;
       if (category !== "All") params.category = category;
@@ -210,9 +210,15 @@ export default function ProductPage() {
             Product
           </h2>
 
-          <button className="text-[#927f68] text-sm font-medium">
-            Setup Opening Stock
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center mt- gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 border-1 cursor-pointer rounded-md text-sm"
+            >
+              <Plus size={16} />
+              Create New
+            </button>
+          </div>
         </div>
 
         {/* ACTION BAR */}
@@ -221,7 +227,7 @@ export default function ProductPage() {
             {/* Left Buttons */}
 
             <div className="relative  justify-center items-center gap-1">
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 mt-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 mt- gap-4">
                 <div className="relative">
                   <Search
                     size={16}
@@ -253,6 +259,19 @@ export default function ProductPage() {
                 />
 
                 <CustomSelect
+                  label="Sub Category"
+                  options={[
+                    { label: "All", value: "All" },
+                    ...subCategories.map((sc) => ({
+                      label: sc.name,
+                      value: sc._id,
+                    })),
+                  ]}
+                  value={subCategory}
+                  onChange={setSubCategory}
+                />
+
+                <CustomSelect
                   label="Brand"
                   options={[
                     { label: "All", value: "All" },
@@ -264,15 +283,6 @@ export default function ProductPage() {
                   value={brand}
                   onChange={setBrand}
                 />
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center mt-5 gap-2 bg-[#f5efdd] text-[#927f68] px-4 py-2 rounded-md text-sm"
-                  >
-                    <Plus size={16} />
-                    Create New
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -289,7 +299,7 @@ export default function ProductPage() {
                   <th className="px-4 py-3">Name</th>
                   <th className="px-4 py-3">MRP</th>
                   <th className="px-4 py-3">Starting Price</th>
-                  <th className="px-4 py-3">Qty</th>
+                  <th className="px-4 py-3">Varinat Qty</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Actions</th>
                 </tr>
@@ -430,6 +440,7 @@ export default function ProductPage() {
           <AddProductModal
             onClose={() => setIsAddModalOpen(false)}
             onSubmit={handleCreateProduct}
+            brand={brands}
           />
         )}
 

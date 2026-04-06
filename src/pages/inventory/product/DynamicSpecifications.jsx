@@ -459,8 +459,9 @@ export default function DynamicSpecifications({
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
+        <>
+        
+            <div className="flex justify-between items-center col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
                     Product Specifications
                 </label>
@@ -481,7 +482,7 @@ export default function DynamicSpecifications({
                 if (!attr) return null;
 
                 return (
-                    <div key={spec.id} className="flex gap-3 items-start">
+                    <div key={spec.id} className="col-span-1">
                         <div className="flex-1">
                             <div className="text-sm font-medium text-gray-600 mb-1 capitalize">
                                 {spec.key.replace(/([A-Z])/g, ' $1')}
@@ -519,6 +520,6 @@ export default function DynamicSpecifications({
                     </p>
                 </div>
             )}
-        </div>
+      </>
     );
 }

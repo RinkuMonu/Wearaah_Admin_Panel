@@ -1,9 +1,11 @@
 import {
   Boxes,
   FeatherIcon,
+  IndianRupeeIcon,
   LayoutDashboard,
   ListOrderedIcon,
   MessageSquare,
+  ScanLine,
   Truck,
   User2,
   UserCheck2,
@@ -30,13 +32,18 @@ export const menuItems = [
         path: "/SellerManagementTable",
         roles: ["superadmin"],
       },
+      {
+        name: "Rider",
+        path: "/riderManagementTable",
+        roles: ["superadmin"],
+      },
       // { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
     ],
   },
   {
     name: "QC Management",
-    icon: User2,
-    roles: ["superadmin", "`seller`"],
+    icon: ScanLine,
+    roles: ["superadmin", "seller"],
     submenu: [
       {
         name: "Variant QC",
@@ -82,43 +89,49 @@ export const menuItems = [
     roles: ["superadmin", "seller"],
   },
   {
-    name: "Lead We Have",
-    path: "/leadwehave",
-    icon: UserCheck2,
-    roles: ["superadmin"],
+    name: "Withdrawal Requests",
+    path: "/withdrawal/requests",
+    icon: IndianRupeeIcon,
+    roles: ["superadmin", "seller"],
   },
   {
     name: "Wallet Report",
     path: "/wallettransactions",
     icon: Wallet,
-    roles: ["superadmin"],
-  },
-  {
-    name: "Employee",
-    path: "/employee",
-    icon: Users,
-    roles: ["superadmin"],
-  },
-
-  {
-    name: "Purchase",
-    icon: Truck,
     roles: ["superadmin", "seller"],
-    submenu: [
-      {
-        name: "All Purchases",
-        path: "/purchase",
-        roles: ["superadmin", "seller"],
-      },
-      { name: "Add Purchase", path: "/purchase/add", roles: ["seller"] },
-      { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
-    ],
   },
-
   {
-    name: "Contact",
-    path: "/contact",
-    icon: MessageSquare,
-    roles: ["superadmin", "employee"],
+    name: "Lead We Have",
+    path: "/leadwehave",
+    icon: UserCheck2,
+    roles: ["superadmin"],
   },
+  // {
+  //   name: "Employee",
+  //   path: "/employee",
+  //   icon: Users,
+  //   roles: ["superadmin"],
+  // },
+
+  // {
+  //   name: "Purchase",
+  //   icon: Truck,
+  //   roles: ["superadmin", "seller"],
+  //   submenu: [
+  //     {
+  //       name: "All Purchases",
+  //       path: "/purchase",
+  //       roles: ["superadmin", "seller"],
+  //     },
+  //     { name: "Add Purchase", path: "/purchase/add", roles: ["seller"] },
+  //     { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
+  //   ],
+  // },
+
+  // {
+  //   name: "Contact",
+  //   path: "/contact",
+  //   icon: MessageSquare,
+  //   roles: ["superadmin", "employee"],
+  // },
 ];

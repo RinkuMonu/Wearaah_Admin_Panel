@@ -4,7 +4,7 @@ import RichTextEditor from "./RichTextEditor";
 import DynamicSpecifications from "./DynamicSpecifications";
 import api from "../../../serviceAuth/axios";
 
-export default function AddProductModal({ onClose, onSubmit }) {
+export default function AddProductModal({ onClose, onSubmit, brand }) {
   const [form, setForm] = useState({
     brandId: "",
     subCategoryId: "",
@@ -23,7 +23,7 @@ export default function AddProductModal({ onClose, onSubmit }) {
     productImage: [],
   });
 
-  const [brands, setBrands] = useState([]);
+  const [brands, setBrands] = useState(brand || []);
   const [categories, setCategories] = useState([]);
   console.log(categories);
   const [filteredSubCategories, setFilteredSubCategories] = useState([]);
@@ -32,29 +32,9 @@ export default function AddProductModal({ onClose, onSubmit }) {
   const [loading, setLoading] = useState(false);
 
   // Individual loading states
-  const [loadingBrands, setLoadingBrands] = useState(true);
-  const [loadingWearTypes, setLoadingWearTypes] = useState(false);
+  const [errorr, seterrorr] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [loadingSubCategories, setLoadingSubCategories] = useState(false);
-
-  // Fetch brands on component mount
-  useEffect(() => {
-    fetchBrands();
-  }, []);
-
-  const fetchBrands = async () => {
-    setLoadingBrands(true);
-    try {
-      const brandsRes = await api.get("/brand");
-      if (brandsRes.data.success) {
-        setBrands(brandsRes.data.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching brands:", error);
-    } finally {
-      setLoadingBrands(false);
-    }
-  };
 
   // Fetch categories when wear type is selected
   useEffect(() => {
@@ -144,6 +124,7 @@ export default function AddProductModal({ onClose, onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    seterrorr("");
 
     try {
       // Create FormData for file uploads
@@ -177,6 +158,10 @@ export default function AddProductModal({ onClose, onSubmit }) {
       // Call the onSubmit prop with formData
       await onSubmit(formData);
     } catch (error) {
+      seterrorr(
+        error.response?.data?.message ||
+          "An error occurred while creating the product.",
+      );
       console.error("Error in handleSubmit:", error);
     } finally {
       setLoading(false);
@@ -212,9 +197,9 @@ export default function AddProductModal({ onClose, onSubmit }) {
                 className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-0 focus:border-gray-400"
               >
                 <option value="">Select Brand</option>
-                {loadingBrands ? (
+                {brands.length === 0 ? (
                   <option value="" disabled>
-                    Loading brands...
+                    No brands available
                   </option>
                 ) : (
                   brands.map((brand) => (
@@ -235,9 +220,7 @@ export default function AddProductModal({ onClose, onSubmit }) {
                 value={form.subCategoryId}
                 onChange={handleChange}
                 required
-                disabled={
-                  filteredSubCategories.length === 0
-                }
+                disabled={filteredSubCategories.length === 0}
                 className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-0 focus:border-gray-400 disabled:bg-gray-100"
               >
                 <option value="">Select Sub Category</option>
@@ -445,7 +428,7 @@ export default function AddProductModal({ onClose, onSubmit }) {
             </div>
 
             {/* Specifications */}
-            <div className="col-span-2 mt-4">
+            <div className="col-span-2 grid grid-cols-2 gap-4 mt-4">
               <DynamicSpecifications
                 subCategoryId={form.subCategoryId}
                 onChange={handleSpecificationsChange}
@@ -453,6 +436,7 @@ export default function AddProductModal({ onClose, onSubmit }) {
               />
             </div>
           </div>
+          {errorr && <p className="text-red-500 text-sm mt-4">{errorr}</p>}
 
           {/* Buttons */}
           <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-[#e6dcc7]">

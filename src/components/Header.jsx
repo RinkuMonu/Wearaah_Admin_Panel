@@ -1,12 +1,22 @@
 import { useState, useRef, useEffect } from "react";
-import { UserRound, LogOut, KeyRound, User, Package } from "lucide-react";
+import {
+  UserRound,
+  LogOut,
+  KeyRound,
+  User,
+  Package,
+  Wallet,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { Phone, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../serviceAuth/context";
 
 export default function Header({ toggleSidebar }) {
-  const { unseenCount } = useAuth();
+  const { unseenCount, walletAmount } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
+  const [showBalance, setShowBalance] = useState(false);
   const profileRef = useRef(null);
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -110,6 +120,28 @@ export default function Header({ toggleSidebar }) {
         </div>
 
         <div className="flex items-center gap-6">
+          <div className="cursor-pointer">
+            <Link to={"/odersPage"} className="flex items-center gap-2">
+              {/* Wallet Icon */}
+              <Wallet />
+
+              {/* Balance */}
+              <span className="font-semibold">
+                {showBalance ? `₹ ${walletAmount}` : "₹ ****"}
+              </span>
+
+              {/* Eye Icon */}
+              <span
+                onClick={(e) => {
+                  e.preventDefault(); // 🔥 link click stop
+                  setShowBalance(!showBalance);
+                }}
+                className="cursor-pointer"
+              >
+                {showBalance ? <EyeOff size={18} /> : <Eye size={18} />}
+              </span>
+            </Link>
+          </div>
           <div className="relative cursor-pointer">
             <Link to={"/odersPage"}>
               <Package />
@@ -152,7 +184,7 @@ export default function Header({ toggleSidebar }) {
                     My Profile
                   </Link>
 
-                  <button
+                  {/* <button
                     onClick={() => {
                       setShowPasswordModal(true);
                       setActiveTab("forgot");
@@ -161,7 +193,7 @@ export default function Header({ toggleSidebar }) {
                   >
                     <KeyRound size={16} />
                     Change Password
-                  </button>
+                  </button> */}
 
                   <div className="border-t my-2"></div>
 

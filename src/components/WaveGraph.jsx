@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  Tooltip,
-} from "recharts";
+import { ResponsiveContainer, AreaChart, Area, Tooltip } from "recharts";
 import {
   DollarSign,
   ShoppingBag,
@@ -59,7 +54,7 @@ export default function WaveGraphSection() {
   const cards = [
     {
       title: "Total Earnings",
-      value: "$334,945",
+      value: "334,945",
       trend: "up",
       icon: DollarSign,
       color: "#22c55e",
@@ -112,35 +107,9 @@ export default function WaveGraphSection() {
             >
               {/* Dropdown */}
               <div className="relative inline-block mb-2">
-                <div
-                  onClick={() =>
-                    setOpenDropdown(
-                      openDropdown === index ? null : index
-                    )
-                  }
-                  className="flex items-center text-sm text-gray-500 cursor-pointer select-none"
-                >
-                  {selectedFilter[index]}
-                  <ChevronDown size={16} className="ml-1" />
+                <div className="flex items-center text-sm text-gray-500 select-none">
+                  Montly
                 </div>
-
-                {openDropdown === index && (
-                  <div className="absolute mt-2 bg-white shadow-lg rounded-lg text-sm w-28 z-50">
-                    {["Weekly", "Monthly", "Yearly"].map(
-                      (option) => (
-                        <div
-                          key={option}
-                          onClick={() =>
-                            handleFilterChange(index, option)
-                          }
-                          className="px-3 py-2 hover:bg-gray-100 cursor-pointer rounded-lg"
-                        >
-                          {option}
-                        </div>
-                      )
-                    )}
-                  </div>
-                )}
               </div>
 
               {/* Top Section */}
@@ -159,21 +128,6 @@ export default function WaveGraphSection() {
                       <span className="text-xl font-bold text-gray-900">
                         {card.value}
                       </span>
-
-                      <span
-                        className={`flex items-center text-sm font-semibold ${
-                          isUp
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {isUp ? (
-                          <TrendingUp size={16} />
-                        ) : (
-                          <TrendingDown size={16} />
-                        )}
-                        1.56%
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -182,9 +136,7 @@ export default function WaveGraphSection() {
               {/* Graph */}
               <div className="h-24">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={chartData[selectedFilter[index]]}
-                  >
+                  <AreaChart data={chartData[selectedFilter[index]]}>
                     <defs>
                       <linearGradient
                         id={`color-${index}`}
@@ -210,8 +162,7 @@ export default function WaveGraphSection() {
                       contentStyle={{
                         borderRadius: "8px",
                         border: "none",
-                        boxShadow:
-                          "0 4px 12px rgba(0,0,0,0.1)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                       cursor={{ strokeDasharray: "3 3" }}
                     />
