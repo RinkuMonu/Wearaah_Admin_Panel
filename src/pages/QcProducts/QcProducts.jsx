@@ -21,30 +21,30 @@ import {
   Loader2,
   Shield,
   Users,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import api from "../../serviceAuth/axios";
 import Swal from "sweetalert2";
 import VariantQCModal from "./QcViewModel";
 
-
 export default function QCProductsList() {
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+
   // Modal state
   const [showVariantModal, setShowVariantModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedProductName, setSelectedProductName] = useState("");
-  
+
   // Filters
   const [filters, setFilters] = useState({
     search: "",
     category: "",
     brand: "",
     sellerId: "",
-    sort: "latest"
+    sort: "latest",
   });
   const [showFilters, setShowFilters] = useState(false);
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -80,7 +80,7 @@ export default function QCProductsList() {
         category: filters.category || undefined,
         brand: filters.brand || undefined,
         sellerId: filters.sellerId || undefined,
-        sort: filters.sort || undefined
+        sort: filters.sort || undefined,
       };
 
       const res = await api.get("/product/qc-products", { params });
@@ -103,12 +103,17 @@ export default function QCProductsList() {
   const fetchFilterOptions = async () => {
     try {
       const [categoriesRes, brandsRes, sellersRes] = await Promise.all([
-        api.get("/subcategory/nameonly").catch(() => ({ data: { success: false } })),
+        api
+          .get("/subcategory/nameonly")// ye api invetory me bi hai keep safe
+          .catch(() => ({ data: { success: false } })),
         api.get("/brand/nameonly").catch(() => ({ data: { success: false } })),
-        api.get("/seller/getseller").catch(() => ({ data: { success: false } }))
+        api
+          .get("/seller/getseller")
+          .catch(() => ({ data: { success: false } })),
       ]);
 
-      if (categoriesRes.data.success) setCategories(categoriesRes.data.categories || []);
+      if (categoriesRes.data.success)
+        setCategories(categoriesRes.data.categories || []);
       if (brandsRes.data.success) setBrands(brandsRes.data.brands || []);
       if (sellersRes.data.success) setSellers(sellersRes.data.sellers || []);
     } catch (err) {
@@ -118,14 +123,22 @@ export default function QCProductsList() {
 
   useEffect(() => {
     fetchQCProducts();
-  }, [page, limit, debouncedSearch, filters.category, filters.brand, filters.sellerId, filters.sort]);
+  }, [
+    page,
+    limit,
+    debouncedSearch,
+    filters.category,
+    filters.brand,
+    filters.sellerId,
+    filters.sort,
+  ]);
 
   useEffect(() => {
     fetchFilterOptions();
   }, []);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setPage(1);
   };
 
@@ -135,31 +148,36 @@ export default function QCProductsList() {
       category: "",
       brand: "",
       sellerId: "",
-      sort: "latest"
+      sort: "latest",
     });
     setDebouncedSearch("");
     setPage(1);
   };
 
-  const handleReviewVariants = (productId, productName) => {
+  const handleReviewVariants = (
+    productId,
+    productName,
+    productSpecifications,
+  ) => {
     setSelectedProductId(productId);
     setSelectedProductName(productName);
     setShowVariantModal(true);
+    setSelectedProduct(productSpecifications);
   };
 
   const stats = useMemo(() => {
     return {
       total: totalCount,
-      pending: products.length
+      pending: products.length,
     };
   }, [totalCount, products]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
@@ -169,10 +187,14 @@ export default function QCProductsList() {
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Quality Check Management</h1>
-            <p className="text-sm text-gray-500 mt-1">Review and approve products with pending variants</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+              Quality Check Management
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Review and approve products with pending variants
+            </p>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -189,7 +211,9 @@ export default function QCProductsList() {
               className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               title="Refresh"
             >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+              />
             </button>
           </div>
         </div>
@@ -200,31 +224,37 @@ export default function QCProductsList() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Total Pending QC</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {stats.total}
+                </p>
               </div>
               <div className="p-3 bg-yellow-100 rounded-lg">
                 <Clock className="w-5 h-5 text-yellow-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Current Page</p>
-                <p className="text-2xl font-bold text-blue-600">{page} / {totalPages}</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {page} / {totalPages}
+                </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <Package className="w-5 h-5 text-blue-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Products to Review</p>
-                <p className="text-2xl font-bold text-purple-600">{products.length}</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {products.length}
+                </p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Shield className="w-5 h-5 text-purple-600" />
@@ -246,7 +276,7 @@ export default function QCProductsList() {
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
-          
+
           <div className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Search */}
@@ -261,7 +291,9 @@ export default function QCProductsList() {
                     placeholder="Product name..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.search}
-                    onChange={(e) => handleFilterChange("search", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("search", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -276,11 +308,15 @@ export default function QCProductsList() {
                   <select
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.category}
-                    onChange={(e) => handleFilterChange("category", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("category", e.target.value)
+                    }
                   >
                     <option value="">All Categories</option>
-                    {categories.map(cat => (
-                      <option key={cat._id} value={cat._id}>{cat.name}</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -296,11 +332,15 @@ export default function QCProductsList() {
                   <select
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.brand}
-                    onChange={(e) => handleFilterChange("brand", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("brand", e.target.value)
+                    }
                   >
                     <option value="">All Brands</option>
-                    {brands?.map(b => (
-                      <option key={b._id} value={b._id}>{b?.name}</option>
+                    {brands?.map((b) => (
+                      <option key={b._id} value={b._id}>
+                        {b?.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -316,11 +356,15 @@ export default function QCProductsList() {
                   <select
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.sellerId}
-                    onChange={(e) => handleFilterChange("sellerId", e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("sellerId", e.target.value)
+                    }
                   >
                     <option value="">All Sellers</option>
-                    {sellers.map(s => (
-                      <option key={s._id} value={s._id}>{s.name || s.shopName || s.email}</option>
+                    {sellers.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.name || s.shopName || s.email}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -374,8 +418,12 @@ export default function QCProductsList() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
           <div className="flex flex-col items-center gap-3">
             <Package className="w-12 h-12 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900">No products pending QC</h3>
-            <p className="text-sm text-gray-500">All products have been reviewed or none are pending quality check</p>
+            <h3 className="text-lg font-medium text-gray-900">
+              No products pending QC
+            </h3>
+            <p className="text-sm text-gray-500">
+              All products have been reviewed or none are pending quality check
+            </p>
           </div>
         </div>
       ) : (
@@ -389,7 +437,9 @@ export default function QCProductsList() {
               <div className="relative h-48 bg-gray-100">
                 {product.productImage && product.productImage[0] ? (
                   <img
-                    src={import.meta.env.VITE_BASE_URL + product.productImage[0]}
+                    src={
+                      import.meta.env.VITE_BASE_URL + product.productImage[0]
+                    }
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
@@ -411,23 +461,27 @@ export default function QCProductsList() {
                 <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">
                   {product.name}
                 </h3>
-                
+
                 <div className="space-y-2 mt-3">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Tag className="w-4 h-4 text-gray-400" />
                     <span>{product.brandId?.name || "No Brand"}</span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <FolderOpen className="w-4 h-4 text-gray-400" />
                     <span>{product.categoryId?.name || "No Category"}</span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Store className="w-4 h-4 text-gray-400" />
-                    <span>{product.sellerId?.name || product.sellerId?.email || "Unknown Seller"}</span>
+                    <span>
+                      {product.sellerId?.ownerName ||
+                        product.sellerId?.email ||
+                        "Fashion hub Seller"}
+                    </span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="w-4 h-4 text-gray-400" />
                     <span>Added: {formatDate(product.createdAt)}</span>
@@ -436,7 +490,13 @@ export default function QCProductsList() {
 
                 {/* Action Button */}
                 <button
-                  onClick={() => handleReviewVariants(product._id, product.name)}
+                  onClick={() =>
+                    handleReviewVariants(
+                      product._id,
+                      product.name,
+                      product.specifications,
+                    )
+                  }
                   className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Eye className="w-4 h-4" />
@@ -453,7 +513,8 @@ export default function QCProductsList() {
         <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-700">
-              Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, totalCount)} of {totalCount} products
+              Showing {(page - 1) * limit + 1} to{" "}
+              {Math.min(page * limit, totalCount)} of {totalCount} products
             </span>
             <select
               value={limit}
@@ -511,6 +572,7 @@ export default function QCProductsList() {
         <VariantQCModal
           productId={selectedProductId}
           productName={selectedProductName}
+          productSpecifications={selectedProduct}
           onClose={() => {
             setShowVariantModal(false);
             setSelectedProductId(null);

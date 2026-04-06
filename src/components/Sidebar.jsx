@@ -6,6 +6,7 @@ import { menuItems } from "./sidebarMenu";
 
 export default function Sidebar({ isOpen }) {
   const { user } = useAuth();
+  // console.log("User Role in Sidebar:", user); // 👉 Debugging line
   const [openMenu, setOpenMenu] = useState(null);
 
   useEffect(() => {
