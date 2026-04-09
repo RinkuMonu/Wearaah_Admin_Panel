@@ -1,17 +1,17 @@
 // pages/admin/SellerList.jsx
 import { useEffect, useState, useMemo } from "react";
 import Swal from "sweetalert2";
-import { 
-  Eye, 
-  Search, 
-  Filter, 
-  X, 
-  RefreshCw, 
-  Store, 
-  User, 
-  Phone, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Eye,
+  Search,
+  Filter,
+  X,
+  RefreshCw,
+  Store,
+  User,
+  Phone,
+  CheckCircle,
+  XCircle,
   Clock,
   AlertCircle,
   Shield,
@@ -51,6 +51,14 @@ export default function SellerList() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [limit, setLimit] = useState(10);
+
+  const [statusModal, setStatusModal] = useState({
+    open: false,
+    sellerId: null,
+    isActive: true,
+  });
+
+  const [blockReason, setBlockReason] = useState("");
 
   // Stats calculation
   const stats = useMemo(() => {
@@ -103,6 +111,9 @@ export default function SellerList() {
     fetchSellers();
   }, [debouncedSearch, filters.kycStatus, filters.kycStep, filters.isApproved, page, limit]);
 
+
+
+
   /* 🔥 VIEW SELLER */
   const handleView = async (id) => {
     try {
@@ -136,10 +147,10 @@ export default function SellerList() {
       submitted: { color: "bg-blue-100 text-blue-800", icon: FileText, label: "Submitted" },
       rejected: { color: "bg-red-100 text-red-800", icon: XCircle, label: "Rejected" },
     };
-    
+
     const config = statusConfig[status] || { color: "bg-gray-100 text-gray-800", icon: AlertCircle, label: status };
     const Icon = config.icon;
-    
+
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${config.color}`}>
         <Icon className="w-3 h-3" />
@@ -157,6 +168,24 @@ export default function SellerList() {
     });
   };
 
+  const updateStatus = async () => {
+    try {
+      await api.put(`/auth/update/user/status/${statusModal.sellerId}`, {
+        isActive: statusModal.isActive,
+        blockReason: statusModal.isActive ? "" : blockReason,
+      });
+
+      Swal.fire("Success", "Status updated successfully", "success");
+
+      setStatusModal({ open: false, sellerId: null, isActive: true });
+      setBlockReason("");
+
+      fetchSellers(); // refresh list
+    } catch (err) {
+      Swal.fire("Error", err.response?.data?.message || "Failed", "error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {/* Header */}
@@ -166,7 +195,7 @@ export default function SellerList() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Seller Management</h1>
             <p className="text-sm text-gray-500 mt-1">Manage and monitor all seller accounts</p>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -201,7 +230,7 @@ export default function SellerList() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -213,7 +242,7 @@ export default function SellerList() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -225,7 +254,7 @@ export default function SellerList() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -264,7 +293,7 @@ export default function SellerList() {
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
-          
+
           <div className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Search */}
@@ -418,14 +447,14 @@ export default function SellerList() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <User className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-900">{seller.ownerName}</span>
+                        <span className="text-gray-900">  {seller.userId?.name || "-"}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-1 text-sm text-gray-600">
                           <Phone className="w-3 h-3" />
-                          <span>{seller.mobile}</span>
+                          <span>{seller.userId?.mobile || "-"}</span>
                         </div>
                         {seller.email && (
                           <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -438,7 +467,7 @@ export default function SellerList() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <div className="w-full max-w-[100px] bg-gray-200 rounded-full h-2">
-                          <div 
+                          <div
                             className="bg-blue-600 h-2 rounded-full transition-all"
                             style={{ width: `${(seller.kycStep / 5) * 100}%` }}
                           />
@@ -471,10 +500,33 @@ export default function SellerList() {
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => handleView(seller._id)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                         title="View details"
                       >
                         <Eye className="w-4 h-4" />
+                      </button>
+
+                      {/* Activate / Deactivate Button */}
+                      <button
+                        onClick={() =>
+                          setStatusModal({
+                            open: true,
+                            sellerId: seller.userId?._id,
+                            isActive: !seller.userId?.isActive,
+                          })
+                        }
+                        className={`px-3 py-1 text-xs rounded-lg ${seller.userId?.isActive
+                          ? "bg-red-100 text-red-600"
+                          : "bg-green-100 text-green-600"
+                          }`}
+                      >
+                        {/* {seller.userId?.isActive ? "Deactivate" : "Activate"} */}
+                        <span className={`text-xs px-2 py-1 rounded cursor-pointer ${seller.userId?.isActive
+                            ? "bg-green-100 text-green-600"
+                            : "bg-red-100 text-red-600"
+                          }`}>
+                          {seller.userId?.isActive ? "Active" : "Blocked"}
+                        </span>
                       </button>
                     </td>
                   </tr>
@@ -551,6 +603,75 @@ export default function SellerList() {
           onUpdate={fetchSellers}
         />
       )}
+
+
+   {statusModal.open && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    
+    <div className="bg-white w-[420px] rounded-2xl shadow-xl p-6 animate-fadeIn">
+      
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-gray-800">
+          {statusModal.isActive ? "Activate Seller" : "Deactivate Seller"}
+        </h2>
+
+        <button
+          onClick={() => setStatusModal({ open: false })}
+          className="text-gray-400 hover:text-gray-600 text-lg"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Info Message */}
+      <p className="text-sm text-gray-500 mb-4">
+        {statusModal.isActive
+          ? "This seller will be able to access the platform again."
+          : "This seller will be blocked and logged out immediately."}
+      </p>
+
+      {/* Reason Input */}
+      {!statusModal.isActive && (
+        <div className="mb-4">
+          <label className="text-sm font-medium text-gray-700">
+            Block Reason <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            placeholder="Enter reason for deactivation..."
+            className="w-full mt-1 border border-gray-300 focus:border-red-400 focus:ring-1 focus:ring-red-200 p-2 rounded-lg outline-none transition"
+            rows={3}
+            value={blockReason}
+            onChange={(e) => setBlockReason(e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3 mt-4">
+        <button
+          onClick={() => setStatusModal({ open: false })}
+          className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={updateStatus}
+          className={`px-4 py-2 rounded-lg text-white transition ${
+            statusModal.isActive
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-red-600 hover:bg-red-700"
+          }`}
+        >
+          {statusModal.isActive ? "Activate" : "Deactivate"}
+        </button>
+      </div>
     </div>
+  </div>
+)}
+    </div>
+
+
   );
 }
