@@ -26,7 +26,17 @@ export default function Step2Business({ onSuccess }) {
   const [focusedField, setFocusedField] = useState(null);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    let { name, value } = e.target;
+
+    // ✅ GSTIN
+    if (name === "GSTIN") {
+      value = value.toUpperCase(); // uppercase auto
+
+      value = value.replace(/[^0-9A-Z]/g, "");
+      if (value.length > 15) return;
+    }
+
+    setForm({ ...form, [name]: value });
   };
 
   const validate = () => {
@@ -152,6 +162,9 @@ export default function Step2Business({ onSuccess }) {
           onChange={handleChange}
           onFocus={() => setFocusedField("shopName")}
           onBlur={() => setFocusedField(null)}
+          onKeyPress={(e) => {
+            if (!/[A-Za-z\s]/.test(e.key)) e.preventDefault();
+          }}
           className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
         />
       </div>
@@ -310,6 +323,11 @@ export default function Step2Business({ onSuccess }) {
             onChange={handleChange}
             onFocus={() => setFocusedField("GSTIN")}
             onBlur={() => setFocusedField(null)}
+            onKeyPress={(e) => {
+              if (!/[0-9A-Za-z]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
             className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
           />
         </div>
