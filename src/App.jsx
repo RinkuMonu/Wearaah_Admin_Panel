@@ -27,6 +27,7 @@ import WithdrawalRequests from "./pages/WithdrawalRequests/WithdrawalRequests";
 import UserProfile from "./pages/Profile/basic";
 import ProfilePage from "./pages/Profile/Profile";
 import RiderList from "./pages/UserManagement/rider";
+import SearchTest from "./components/test";
 
 function App() {
   useEffect(() => {
@@ -40,6 +41,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="SellerStepper" element={<SellerStepper />} />
+            <Route path="/test" element={<SearchTest />} />
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -55,10 +57,6 @@ function App() {
                 <Route path="leadwehave" element={<LeadsPage />} />
                 <Route path="SellerManagementTable" element={<SellerList />} />
                 <Route path="riderManagementTable" element={<RiderList />} />
-                <Route
-                  path="Variant/Stock/Management"
-                  element={<VariantStockManagement />}
-                />
               </Route>
               <Route element={<RoleProtectedRoute allowedRoles={["seller"]} />}>
                 {/* nothing */}
@@ -79,6 +77,10 @@ function App() {
                 <Route
                   path="wallettransactions"
                   element={<WalletTransactions />}
+                />
+                <Route
+                  path="Variant/Stock/Management"
+                  element={<VariantStockManagement />}
                 />
                 <Route
                   path="withdrawal/requests"

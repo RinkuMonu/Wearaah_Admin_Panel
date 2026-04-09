@@ -148,6 +148,9 @@ export default function Step1Verification({ onSuccess }) {
               placeholder="Full Name"
               value={form.name}
               onChange={handleChange}
+              onKeyPress={(e) => {
+                if (!/[A-Za-z\s]/.test(e.key)) e.preventDefault();
+              }}
               className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
             />
           </div>
@@ -199,6 +202,19 @@ export default function Step1Verification({ onSuccess }) {
               placeholder="Mobile Number"
               value={form.mobile}
               onChange={handleChange}
+              inputMode="numeric"
+              maxLength={10}
+              onKeyPress={(e) => {
+                // ❌ block non-numeric
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault();
+                }
+
+                // ❌ first digit only 6-9
+                if (form.mobile.length === 0 && !/[6-9]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
               className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
             />
           </div>

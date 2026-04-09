@@ -12,7 +12,7 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 
 export default function Step3Address({ onSuccess }) {
@@ -56,7 +56,8 @@ export default function Step3Address({ onSuccess }) {
       (error) => {
         let errorMessage = "Please enable location access";
         if (error.code === 1) {
-          errorMessage = "Location permission denied. Please allow access to capture your location.";
+          errorMessage =
+            "Location permission denied. Please allow access to capture your location.";
         } else if (error.code === 2) {
           errorMessage = "Location unavailable. Please try again.";
         } else if (error.code === 3) {
@@ -126,9 +127,7 @@ export default function Step3Address({ onSuccess }) {
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-gray-900 to-gray-700 text-white mb-4">
           <MapPin className="w-8 h-8" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900">
-          Pickup Location
-        </h3>
+        <h3 className="text-xl font-semibold text-gray-900">Pickup Location</h3>
         <p className="text-sm text-gray-500 mt-1">
           Enter your business address where items will be picked up
         </p>
@@ -138,9 +137,11 @@ export default function Step3Address({ onSuccess }) {
       <div className="space-y-4">
         {/* Street */}
         <div className="relative">
-          <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-            focusedField === "street" ? "text-gray-900" : "text-gray-400"
-          }`}>
+          <div
+            className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
+              focusedField === "street" ? "text-gray-900" : "text-gray-400"
+            }`}
+          >
             <Building2 className="h-5 w-5" />
           </div>
           <input
@@ -156,9 +157,11 @@ export default function Step3Address({ onSuccess }) {
 
         {/* City */}
         <div className="relative">
-          <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-            focusedField === "city" ? "text-gray-900" : "text-gray-400"
-          }`}>
+          <div
+            className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
+              focusedField === "city" ? "text-gray-900" : "text-gray-400"
+            }`}
+          >
             <Building2 className="h-5 w-5" />
           </div>
           <input
@@ -168,15 +171,22 @@ export default function Step3Address({ onSuccess }) {
             onChange={handleChange}
             onFocus={() => setFocusedField("city")}
             onBlur={() => setFocusedField(null)}
+            onKeyPress={(e) => {
+              if (!/[A-Za-z\s]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
             className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
           />
         </div>
 
         {/* State */}
         <div className="relative">
-          <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-            focusedField === "state" ? "text-gray-900" : "text-gray-400"
-          }`}>
+          <div
+            className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
+              focusedField === "state" ? "text-gray-900" : "text-gray-400"
+            }`}
+          >
             <Landmark className="h-5 w-5" />
           </div>
           <input
@@ -186,15 +196,22 @@ export default function Step3Address({ onSuccess }) {
             onChange={handleChange}
             onFocus={() => setFocusedField("state")}
             onBlur={() => setFocusedField(null)}
+            onKeyPress={(e) => {
+              if (!/[A-Za-z\s]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
             className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
           />
         </div>
 
         {/* Pincode */}
         <div className="relative">
-          <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
-            focusedField === "pincode" ? "text-gray-900" : "text-gray-400"
-          }`}>
+          <div
+            className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200 ${
+              focusedField === "pincode" ? "text-gray-900" : "text-gray-400"
+            }`}
+          >
             <Mailbox className="h-5 w-5" />
           </div>
           <input
@@ -204,6 +221,12 @@ export default function Step3Address({ onSuccess }) {
             onChange={handleChange}
             onFocus={() => setFocusedField("pincode")}
             onBlur={() => setFocusedField(null)}
+            onKeyPress={(e) => {
+              // ❌ block non-numeric
+              if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
             maxLength="6"
             className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
           />
@@ -237,9 +260,12 @@ export default function Step3Address({ onSuccess }) {
             <div className="flex items-start gap-2">
               <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-green-800">Location Captured</p>
+                <p className="text-sm font-medium text-green-800">
+                  Location Captured
+                </p>
                 <p className="text-xs text-green-600 mt-1">
-                  Latitude: {coords[1].toFixed(6)} | Longitude: {coords[0].toFixed(6)}
+                  Latitude: {coords[1].toFixed(6)} | Longitude:{" "}
+                  {coords[0].toFixed(6)}
                 </p>
               </div>
             </div>
@@ -251,9 +277,12 @@ export default function Step3Address({ onSuccess }) {
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-yellow-800">Location Access Required</p>
+                <p className="text-sm font-medium text-yellow-800">
+                  Location Access Required
+                </p>
                 <p className="text-xs text-yellow-600 mt-1">
-                  Please enable location services to continue. You can also manually enter your address.
+                  Please enable location services to continue. You can also
+                  manually enter your address.
                 </p>
               </div>
             </div>
@@ -285,8 +314,9 @@ export default function Step3Address({ onSuccess }) {
         <div className="flex items-start gap-2">
           <Navigation className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
           <p className="text-xs text-gray-500">
-            Your pickup location will be used for order collections. Make sure this is accurate 
-            to ensure smooth order pickups. Location services help us verify your business address.
+            Your pickup location will be used for order collections. Make sure
+            this is accurate to ensure smooth order pickups. Location services
+            help us verify your business address.
           </p>
         </div>
       </div>

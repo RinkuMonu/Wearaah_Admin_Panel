@@ -142,6 +142,11 @@ export default function Step4Bank({ onSuccess }) {
           onChange={handleChange}
           onFocus={() => setFocusedField("accountHolderName")}
           onBlur={() => setFocusedField(null)}
+          onKeyPress={(e) => {
+            if (!/[A-Za-z\s]/.test(e.key)) {
+              e.preventDefault();
+            }
+          }}
           className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 outline-none"
         />
       </div>

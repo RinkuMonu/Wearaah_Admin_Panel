@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     if (user && user?.user?.role === "seller") {
       fetchSellerData();
     }
-  }, [token]);
+  }, [user?.user?.role]);
 
   const fetchMissedOrders = async () => {
     try {

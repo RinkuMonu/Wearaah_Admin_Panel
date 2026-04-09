@@ -499,6 +499,7 @@ function DocumentUpload({
 }) {
   const [preview, setPreview] = useState(null);
   const [fileType, setFileType] = useState(null);
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     if (file) {
@@ -522,10 +523,11 @@ function DocumentUpload({
   }, [file]);
 
   const getFileUrl = (path) => {
+    console.log("Getting file URL for path:", path);
     if (!path) return null;
-    if (path.startsWith("http")) return path;
+    // if (path.startsWith("http")) return path;
     if (path.startsWith("/uploads")) return `${BASE_URL}${path}`;
-    return `http://localhost:5000/uploads/${path.split("\\").pop()}`;
+    return `${BASE_URL}/${path.split("\\").pop()}`;
   };
 
   const openDocument = (url) => {
