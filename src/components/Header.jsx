@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../serviceAuth/context";
 
 export default function Header({ toggleSidebar }) {
-  const { unseenCount, walletAmount } = useAuth();
+  const { unseenCount, walletAmount, user } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
   const [showBalance, setShowBalance] = useState(false);
   const profileRef = useRef(null);
@@ -107,12 +107,17 @@ export default function Header({ toggleSidebar }) {
       <header className="w-full bg-black text-white px-6 py-3 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-[#f5efdd]">Wearaah</span>
-            {/* <span className="bg-gray-200 text-black text-xs px-2 py-0.5 rounded font-semibold">
-                ERP
-              </span> */}
+            <span className="text-3xl font-bold text-[#f5efdd]">
+              {user?.user?.name || "Wearaah"}
+            </span>
           </div>
-
+          {/* <div className="flex items-center gap-2 rounded-md">
+            <img
+              src="/wearaahlogo.jpg"
+              alt="Logo"
+              className="w-16 h-10 rounded-sm"
+            />
+          </div> */}
           <Menu
             onClick={toggleSidebar}
             className="w-5 h-5 text-gray-300 cursor-pointer hover:text-white ml-8"

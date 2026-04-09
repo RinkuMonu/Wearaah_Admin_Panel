@@ -21,6 +21,7 @@ export default function AddProductModal({ onClose, onSubmit, brand }) {
     isBestSelling: false,
     isTopRated: false,
     productImage: [],
+    keywords: "",
   });
 
   const [brands, setBrands] = useState(brand || []);
@@ -307,6 +308,28 @@ export default function AddProductModal({ onClose, onSubmit, brand }) {
               <p className="text-xs text-gray-500 mt-1">
                 {form.description?.replace(/<[^>]*>/g, "").length || 0}{" "}
                 characters
+              </p>
+            </div>
+            {/* keyword */}
+            {/* Keywords */}
+            <div className="col-span-2">
+              <label className="block text-sm font-medium mb-1">
+                Keywords (Search Tags)
+              </label>
+
+              <input
+                type="text"
+                name="keywords"
+                value={form.keywords}
+                onChange={handleChange}
+                placeholder="e.g. black tshirt, oversized tshirt, cotton tshirt"
+                className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm"
+              />
+
+              {/* 🔥 Seller Guide */}
+              <p className="text-xs text-gray-500 mt-1">
+                Add comma separated keywords that customers might search. (high sale chance's) <br />
+                Example: <b>shirt for men, black tshirt, oversized tshirt, cotton tshirt</b>
               </p>
             </div>
 
