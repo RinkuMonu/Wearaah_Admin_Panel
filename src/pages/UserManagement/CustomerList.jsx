@@ -586,6 +586,7 @@ export default function CustomerList() {
                                 <option value={100}>100 / page</option>
                             </select>
                         </div>
+                        
 
                         <div className="flex items-center gap-2">
                             <button
