@@ -27,16 +27,16 @@ const SearchTest = () => {
   }, [query]);
 
   // 🔍 Search API
-  const handleSearch = async (value) => {
-    try {
-      const res = await api.get(`/variant/globalsearch?q=${value}`);
-      console.log("Search Results:", res.data);
-      setResults(res.data?.data || []);
-      setSuggestions([]);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // const handleSearch = async (value) => {
+  //   try {
+  //     const res = await api.get(`/variant/globalsearch?q=${value}`);
+  //     console.log("Search Results:", res.data);
+  //     setResults(res.data?.data || []);
+  //     setSuggestions([]);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   // 👉 Suggest click
   const handleSelect = (value) => {

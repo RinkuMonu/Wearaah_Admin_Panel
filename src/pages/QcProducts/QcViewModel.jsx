@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import api from "../../serviceAuth/axios";
 import Swal from "sweetalert2";
+import { useAuth } from "../../serviceAuth/context";
 
 export default function VariantQCModal({
   productId,
@@ -34,7 +35,8 @@ export default function VariantQCModal({
   onSuccess,
   productSpecifications,
 }) {
-  console.log("Product Specifications:", productSpecifications);
+  // console.log("Product Specifications:", productSpecifications);
+  const { user } = useAuth;
   const [variants, setVariants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -116,7 +118,7 @@ export default function VariantQCModal({
           });
           fetchVariants(); // Refresh the list
           if (onSuccess) onSuccess();
-          onClose(); 
+          onClose();
         }
       } catch (err) {
         Swal.fire({
@@ -656,12 +658,12 @@ export default function VariantQCModal({
                             {selectedVariant.stock} units
                           </span>
                         </div>
-                        <div className="flex justify-between text-sm">
+                        {/* <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Returnable:</span>
                           <span className="font-medium">
                             {selectedVariant.returnable ? "Yes" : "No"}
                           </span>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 
@@ -700,7 +702,8 @@ export default function VariantQCModal({
         </div>
 
         {/* Footer Actions */}
-        {activeTab === "detail" &&
+        {user?.user?.role !== "seller" &&
+          activeTab === "detail" &&
           selectedVariant &&
           selectedVariant.status === "pending" &&
           selectedVariant.isActive && (

@@ -26,8 +26,10 @@ import {
 import api from "../../serviceAuth/axios";
 import Swal from "sweetalert2";
 import VariantQCModal from "./QcViewModel";
+import { useAuth } from "../../serviceAuth/context";
 
 export default function QCProductsList() {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -104,7 +106,7 @@ export default function QCProductsList() {
     try {
       const [categoriesRes, brandsRes, sellersRes] = await Promise.all([
         api
-          .get("/subcategory/nameonly")// ye api invetory me bi hai keep safe
+          .get("/subcategory/nameonly") // ye api invetory me bi hai keep safe
           .catch(() => ({ data: { success: false } })),
         api.get("/brand/nameonly").catch(() => ({ data: { success: false } })),
         api
@@ -347,28 +349,30 @@ export default function QCProductsList() {
               </div>
 
               {/* Seller Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Seller
-                </label>
-                <div className="relative">
-                  <Store className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <select
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={filters.sellerId}
-                    onChange={(e) =>
-                      handleFilterChange("sellerId", e.target.value)
-                    }
-                  >
-                    <option value="">All Sellers</option>
-                    {sellers.map((s) => (
-                      <option key={s._id} value={s._id}>
-                        {s.name || s.shopName || s.email}
-                      </option>
-                    ))}
-                  </select>
+              {user?.user?.role !== "seller" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Seller
+                  </label>
+                  <div className="relative">
+                    <Store className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <select
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={filters.sellerId}
+                      onChange={(e) =>
+                        handleFilterChange("sellerId", e.target.value)
+                      }
+                    >
+                      <option value="">All Sellers</option>
+                      {sellers.map((s) => (
+                        <option key={s._id} value={s._id}>
+                          {s.name || s.shopName || s.email}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Sort */}
               <div>

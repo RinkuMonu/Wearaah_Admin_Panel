@@ -932,7 +932,7 @@ export default function WalletTransactions() {
                         {selectedTransaction.description}
                       </p>
                     </div>
-                    {selectedTransaction.referenceId && (
+                    {/* {selectedTransaction.referenceId && (
                       <div>
                         <span className="text-sm text-gray-600">
                           Reference ID:
@@ -961,7 +961,7 @@ export default function WalletTransactions() {
                           Model: {selectedTransaction.referenceModel}
                         </p>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
 
