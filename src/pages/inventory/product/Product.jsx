@@ -200,6 +200,25 @@ export default function ProductPage() {
       debouncedSearch.cancel();
     };
   }, []);
+
+  const handleEditProduct = async (productId) => {
+    try {
+      setLoading(true);
+
+      const res = await api.get(`/product/${productId}`);
+
+      if (res.data.success) {
+        setSelectedProduct(res.data.product);
+        setEditOpen(true);
+      }
+    } catch (error) {
+      console.log("Error fetching product:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   return (
     <>
       <div className="p-6 min-h-screen">
@@ -351,14 +370,13 @@ export default function ProductPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs text-white ${
-                            product.status === "active" ||
-                            product.status === "published"
+                          className={`px-3 py-1 rounded-full text-xs text-white ${product.status === "active" ||
+                              product.status === "published"
                               ? "bg-green-600"
                               : product.status === "pending"
                                 ? "bg-yellow-600"
                                 : "bg-gray-600"
-                          }`}
+                            }`}
                         >
                           {(product.status || "active").toUpperCase()}
                         </span>
@@ -366,10 +384,7 @@ export default function ProductPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => {
-                              setSelectedProduct(product);
-                              setEditOpen(true);
-                            }}
+                            onClick={() => handleEditProduct(product._id)}
                             className="text-gray-600 hover:text-purple-600 hover:bg-purple-100 p-1 rounded-md"
                           >
                             <FileChartPieIcon size={18} />

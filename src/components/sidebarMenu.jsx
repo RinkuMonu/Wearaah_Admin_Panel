@@ -1,6 +1,7 @@
 import {
   Boxes,
   FeatherIcon,
+  HelpCircle,
   IndianRupeeIcon,
   LayoutDashboard,
   ListOrderedIcon,
@@ -37,6 +38,11 @@ export const menuItems = [
         path: "/riderManagementTable",
         roles: ["superadmin"],
       },
+          {
+      name: "Customers",  // ✅ ADD THIS
+      path: "/customers",
+      roles: ["superadmin"],
+    },
       // { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
     ],
   },
@@ -134,4 +140,11 @@ export const menuItems = [
   //   icon: MessageSquare,
   //   roles: ["superadmin", "employee"],
   // },
+
+    {
+    name: "FAQ Management",
+    path: "/faq",
+    icon: HelpCircle,
+    roles: ["superadmin"],
+  },
 ];

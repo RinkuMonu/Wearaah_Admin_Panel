@@ -24,6 +24,12 @@ export default function UpdateVariantModal({
 }) {
   const [showColorDropdown, setShowColorDropdown] = useState(false);
 
+  const [existingImages, setExistingImages] = useState(
+    variant?.variantImages || []
+  );
+
+  const [newImages, setNewImages] = useState([]);
+
   // Get size options based on product configuration
   const sizeOptions =
     product?.sizeType === "numeric"
@@ -146,28 +152,74 @@ export default function UpdateVariantModal({
     setLoading(true);
     setError("");
 
-    try {
-      const response = await api.put(`/variant/admin/variants/${variant._id}`, {
-        variantTitle: form.variantTitle,
-        variantDiscription: form.variantDiscription,
-        size: form.size,
-        color: form.color,
-        pricing: {
-          costPrice: Number(form.pricing.costPrice) || 0,
-          mrp: Number(form.pricing.mrp) || 0,
-          sellingPrice: Number(form.pricing.sellingPrice) || 0,
-          taxPercent,
-        },
-        stock: Number(form.stock) || 0,
-      });
+    // try {
+    //   const response = await api.put(`/variant/admin/variants/${variant._id}`, {
+    //     variantTitle: form.variantTitle,
+    //     variantDiscription: form.variantDiscription,
+    //     size: form.size,
+    //     color: form.color,
+    //     pricing: {
+    //       costPrice: Number(form.pricing.costPrice) || 0,
+    //       mrp: Number(form.pricing.mrp) || 0,
+    //       sellingPrice: Number(form.pricing.sellingPrice) || 0,
+    //       taxPercent,
+    //     },
+    //     stock: Number(form.stock) || 0,
+    //   });
 
-      if (response.data.success) {
-        onSuccess(response.data.variant);
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || "Failed to update variant");
-      console.error(error);
-    } finally {
+    //   if (response.data.success) {
+    //     onSuccess(response.data.variant);
+    //   }
+    // } catch (error) {
+    //   setError(error.response?.data?.message || "Failed to update variant");
+    //   console.error(error);
+    // }
+
+    try {
+  const formData = new FormData();
+
+  formData.append("variantTitle", form.variantTitle);
+  formData.append("variantDiscription", form.variantDiscription);
+  formData.append("size", form.size);
+  formData.append("color", form.color);
+  formData.append("stock", form.stock);
+
+  // pricing
+  formData.append(
+    "pricing",
+    JSON.stringify({
+      costPrice: Number(form.pricing.costPrice) || 0,
+      mrp: Number(form.pricing.mrp) || 0,
+      sellingPrice: Number(form.pricing.sellingPrice) || 0,
+      taxPercent,
+    })
+  );
+
+  // ✅ existing images send
+  formData.append("existingImages", JSON.stringify(existingImages));
+
+  // ✅ new images send
+  newImages.forEach((file) => {
+    formData.append("variantImages", file);
+  });
+
+  const response = await api.put(
+    `/variant/admin/variants/${variant._id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  if (response.data.success) {
+    onSuccess(response.data.variant);
+  }
+} catch (error) {
+  setError(error.response?.data?.message || "Failed to update variant");
+}
+     finally {
       setLoading(false);
     }
   };
@@ -391,11 +443,10 @@ export default function UpdateVariantModal({
                         min="0"
                         step="0.01"
                         placeholder="0.00"
-                        className={`w-full border rounded-lg pl-8 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500 transition ${
-                          touched.sellingPrice && !isValidPrice && mrp > 0
+                        className={`w-full border rounded-lg pl-8 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500 transition ${touched.sellingPrice && !isValidPrice && mrp > 0
                             ? "border-red-500 bg-red-50"
                             : "border-gray-300"
-                        }`}
+                          }`}
                       />
                     </div>
                     {touched.sellingPrice && !isValidPrice && mrp > 0 && (
@@ -426,6 +477,43 @@ export default function UpdateVariantModal({
                   />
                 </div>
 
+                <div className="mb-4">
+                  <label className="text-sm font-medium">Existing Images</label>
+
+                  <div className="flex gap-3 mt-2 flex-wrap">
+                    {existingImages.map((img, i) => (
+                      <div key={i} className="relative">
+                        <img
+                          src={`${import.meta.env.VITE_BASE_URL}${img}`}
+                          className="w-20 h-20 rounded object-cover border"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExistingImages((prev) => prev.filter((_, index) => index !== i))
+                          }
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full px-1"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                </div>
+
+                <div className="mt-4">
+  <label className="text-sm font-medium">Add New Images</label>
+
+  <input
+    type="file"
+    multiple
+    onChange={(e) => setNewImages(Array.from(e.target.files))}
+    className="mt-2"
+  />
+</div>
+
                 {/* Error Message */}
                 {error && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
@@ -438,11 +526,10 @@ export default function UpdateVariantModal({
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${
-                    loading
+                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${loading
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-blue-600 hover:bg-blue-700"
-                  }`}
+                    }`}
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -524,9 +611,8 @@ export default function UpdateVariantModal({
                   </div>
 
                   <div
-                    className={`flex justify-between font-bold text-lg pt-2 border-t border-gray-200 ${
-                      profit >= 0 ? "text-green-600" : "text-red-600"
-                    }`}
+                    className={`flex justify-between font-bold text-lg pt-2 border-t border-gray-200 ${profit >= 0 ? "text-green-600" : "text-red-600"
+                      }`}
                   >
                     <span>Estimated Profit</span>
                     <span>₹{profit.toFixed(2)}</span>
@@ -552,9 +638,8 @@ export default function UpdateVariantModal({
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className={`h-2 rounded-full ${
-                            profit >= 0 ? "bg-green-500" : "bg-red-500"
-                          }`}
+                          className={`h-2 rounded-full ${profit >= 0 ? "bg-green-500" : "bg-red-500"
+                            }`}
                           style={{
                             width: `${Math.min(100, Math.max(0, (profit / sellingPrice) * 100))}%`,
                           }}
