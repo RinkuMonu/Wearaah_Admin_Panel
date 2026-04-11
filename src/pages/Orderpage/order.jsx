@@ -26,6 +26,7 @@ import {
   ShoppingBag,
   Loader2,
   PackageCheckIcon,
+  Store,
 } from "lucide-react";
 import api from "../../serviceAuth/axios";
 import Swal from "sweetalert2";
@@ -44,6 +45,8 @@ export const OrdersPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [showFilters, setShowFilters] = useState(false);
+  const [sellerData, setSellerData] = useState([]);
+  const [sellerId, setSellerId] = useState("");
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -69,6 +72,14 @@ export const OrdersPage = () => {
   // Debounce search
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  const sellerFetch = async () => {
+    const ress = await api.get("/seller/getseller");
+    setSellerData(ress?.data?.sellers);
+  };
+  useEffect(() => {
+    sellerFetch();
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -90,10 +101,11 @@ export const OrdersPage = () => {
         paymentMethod: paymentMethod || undefined,
         dateFrom: dateRange.from || undefined,
         dateTo: dateRange.to || undefined,
+        sellerId: sellerId,
       };
 
       const res = await api.get("/order/myAll", { params });
-
+      console.log(res);
       if (res.data.success) {
         setOrders(res.data.orders || []);
         setTotalPages(res.data.totalPages || 1);
@@ -140,6 +152,7 @@ export const OrdersPage = () => {
     debouncedSearch,
     orderStatus,
     settlementStatus,
+    sellerId,
     paymentMethod,
     dateRange.from,
     dateRange.to,
@@ -152,6 +165,7 @@ export const OrdersPage = () => {
     setPaymentMethod("");
     setDateRange({ from: "", to: "" });
     setPage(1);
+    setSellerId("");
   };
 
   const handleViewOrder = (order) => {
@@ -316,7 +330,7 @@ export const OrdersPage = () => {
               <div>
                 <p className="text-sm text-gray-500">Total Orders</p>
                 <p className="text-2xl font-bold text-gray-800">
-                  {stats.totalCount}
+                  {stats.totalCount || 0}
                 </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
@@ -329,7 +343,7 @@ export const OrdersPage = () => {
               <div>
                 <p className="text-sm text-gray-500">Total Revenue</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {formatCurrency(stats.totalAmount)}
+                  {formatCurrency(stats.totalAmount || 0)}
                 </p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
@@ -343,7 +357,7 @@ export const OrdersPage = () => {
               <div>
                 <p className="text-sm text-gray-500">Upcoming Amount</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {formatCurrency(stats.lockedAmount)}
+                  {formatCurrency(stats.lockedAmount || 0)}
                 </p>
                 {/* <p className="text-xs text-gray-500 mt-1">
                   {formatCurrency(stats.deliveredAmount)}
@@ -360,7 +374,7 @@ export const OrdersPage = () => {
               <div>
                 <p className="text-sm text-gray-500">Delivered</p>
                 <p className="text-2xl font-bold text-red-600">
-                  {stats.deliveredCount}
+                  {stats.deliveredCount || 0}
                 </p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
@@ -373,7 +387,7 @@ export const OrdersPage = () => {
               <div>
                 <p className="text-sm text-gray-500">Cancelled</p>
                 <p className="text-2xl font-bold text-red-600">
-                  {stats.cancelledCount}
+                  {stats.cancelledCount || 0}
                 </p>
               </div>
               <div className="p-3 bg-red-100 rounded-lg">
@@ -468,6 +482,25 @@ export const OrdersPage = () => {
                   <option value="WALLET">Wallet</option>
                 </select>
               </div>
+              {/* seller */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Seller
+                </label>
+                <Store className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={sellerId}
+                  onChange={(e) => setSellerId(e.target.value)}
+                >
+                  <option value="">All Sellers</option>
+                  {sellerData.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.shopName || s.userId.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {/* Date From */}
               <div>
@@ -535,9 +568,9 @@ export const OrdersPage = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Order #
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Seller
-                </th>
+                </th> */}
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Items
                 </th>
@@ -591,7 +624,7 @@ export const OrdersPage = () => {
                         {order.orderNumber}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    {/* <td className="px-4 py-3">
                       <div>
                         <p className="font-medium text-gray-900">
                           {order.seller?.shopName || "N/A"}
@@ -600,7 +633,7 @@ export const OrdersPage = () => {
                           {order.seller?.businessType || "N/A"}
                         </p>
                       </div>
-                    </td>
+                    </td> */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <Package className="w-4 h-4 text-gray-400" />
