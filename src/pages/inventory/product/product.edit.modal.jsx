@@ -13,6 +13,7 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
     returnPolicyDays: 7,
     specifications: {},
     productImage: [],
+    keywords: "",
   });
 
   const [previews, setPreviews] = useState([]);
@@ -23,6 +24,9 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
   useEffect(() => {
     if (!product) return;
 
+      console.log("product keywords:", product.keywords); // 👈 check karo
+
+
     setForm((prev) => ({
       ...prev,
       name: product.name || "",
@@ -30,7 +34,9 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
       status: product.status || "pending",
       returnPolicyDays: product.returnPolicyDays || 7,
       specifications: product.specifications || {},
-    }));
+keywords: Array.isArray(product.keywords)
+  ? product.keywords.join(", ")
+  : product.keywords || "",    }));
 
     if (product.productImage?.length) {
       setPreviews(
@@ -87,6 +93,7 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
       formData.append("description", form.description);
       formData.append("status", form.status);
       formData.append("returnPolicyDays", form.returnPolicyDays);
+      formData.append("keywords", form.keywords);
 
       formData.append("specifications", JSON.stringify(form.specifications));
 
@@ -106,6 +113,9 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
   };
 
   /* ---------------- UI ---------------- */
+
+
+  console.log("form ::: ", form);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -134,7 +144,7 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
               />
             </div>
 
-             {/* SPECIFICATIONS */}
+            {/* SPECIFICATIONS */}
             <div className="col-span-2">
               <DynamicSpecificationsEdit
                 subCategoryId={product.subCategoryId}
@@ -143,7 +153,7 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
               />
             </div>
 
-           
+
 
             {/* IMAGES */}
             <div className="col-span-2">
@@ -166,56 +176,80 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
             </div>
 
             {/* RETURN POLICY */}
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-  {/* RETURN DAYS */}
-  <div className=" p-4 rounded-xl border border-[#927f68]/30 shadow-sm">
-    <label className="text-sm font-medium text-[#927f68] mb-2 flex items-center gap-2">
-      <RotateCcw size={16} />
-      Return Days
-    </label>
+              {/* RETURN DAYS */}
+              <div className=" p-4 rounded-xl border border-[#927f68]/30 shadow-sm">
+                <label className="text-sm font-medium text-[#927f68] mb-2 flex items-center gap-2">
+                  <RotateCcw size={16} />
+                  Return Days
+                </label>
 
-    <div className="relative">
-      <input
-        type="number"
-        name="returnPolicyDays"
-        value={form.returnPolicyDays}
-        onChange={handleChange}
-        placeholder="Enter number of days"
-        className="w-full px-4 py-2 rounded-lg border border-[#927f68]/40 
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="returnPolicyDays"
+                    value={form.returnPolicyDays}
+                    onChange={handleChange}
+                    placeholder="Enter number of days"
+                    className="w-full px-4 py-2 rounded-lg border border-[#927f68]/40 
                    focus:outline-none focus:ring-2 focus:ring-[#927f68] 
                    bg-white transition"
-      />
+                  />
 
-      {/* Optional suffix */}
-      <span className="absolute right-3 top-2.5 text-sm text-gray-400">
-        Days
-      </span>
-    </div>
-  </div>
+                  {/* Optional suffix */}
+                  <span className="absolute right-3 top-2.5 text-sm text-gray-400">
+                    Days
+                  </span>
+                </div>
+              </div>
 
-  {/* STATUS */}
-  <div className=" p-4 rounded-xl border border-[#927f68]/30 shadow-sm">
-    <label className="text-sm font-medium text-[#927f68] mb-2 flex items-center gap-2">
-      <CheckCircle2 size={16} />
-      Status
-    </label>
+              {/* STATUS */}
+              <div className=" p-4 rounded-xl border border-[#927f68]/30 shadow-sm">
+                <label className="text-sm font-medium text-[#927f68] mb-2 flex items-center gap-2">
+                  <CheckCircle2 size={16} />
+                  Status
+                </label>
 
-    <select
-      name="status"
-      value={form.status}
-      onChange={handleChange}
-      className="w-full px-4 py-2 rounded-lg border border-[#927f68]/40 
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 rounded-lg border border-[#927f68]/40 
                  focus:outline-none focus:ring-2 focus:ring-[#927f68] 
                  bg-white transition"
-    >
-      <option value="draft">Draft</option>
-      <option value="pending">Submit for QC</option>
-    </select>
-  </div>
+                >
+                  <option value="draft">Draft</option>
+                  <option value="pending">Submit for QC</option>
+                </select>
+              </div>
 
+            </div>
+
+
+
+            {/* KEYWORDS */}
+<div className="col-span-2">
+  <label className="block text-sm font-medium mb-1">
+    Keywords (Search Tags)
+  </label>
+
+  <input
+    type="text"
+    name="keywords"
+    value={form.keywords}
+    onChange={handleChange}
+    placeholder="e.g. black tshirt, oversized tshirt, cotton tshirt"
+    className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm"
+  />
+
+  <p className="text-xs text-gray-500 mt-1">
+    Add comma separated keywords (better search ranking)
+  </p>
 </div>
-             {/* DESCRIPTION */}
+
+
+            {/* DESCRIPTION */}
             <div className="col-span-2">
               <label className="text-sm">Description *</label>
               <RichTextEditor
@@ -225,7 +259,7 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
               />
             </div>
 
-           
+
           </div>
 
           {/* BUTTONS */}
