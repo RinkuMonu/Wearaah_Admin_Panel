@@ -182,23 +182,15 @@ export default function CategoryModal({ onClose, refresh, editData }) {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [onClose]);
   const categoryOptions = [
-    "Top Wear",
-    "Bottom Wear",
-    "Footwear",
-    "Innerwear",
-    "Winter Wear",
+    "Western Wear",
     "Ethnic Wear",
-    "Activewear",
+    "Innerwear",
     "Sportswear",
     "Sleepwear",
     "Swimwear",
     "Accessories",
-    "Plus Size",
-    "Maternity Wear",
-    "Loungewear",
-    "Formal Wear",
-    "Casual Wear",
-    "Party Wear",
+    "Winter wear",
+    "Summer wear",
   ];
   return (
     <div

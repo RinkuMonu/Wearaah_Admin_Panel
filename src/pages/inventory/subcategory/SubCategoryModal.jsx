@@ -18,6 +18,8 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
   const [variantInput, setVariantInput] = useState("");
   const [displayOrder, setDisplayOrder] = useState(0);
   const [showOnHome, setShowOnHome] = useState(false);
+  const [selectedGenders, setSelectedGenders] = useState([]);
+  const [wearType, setWearType] = useState("");
 
   const [attributes, setAttributes] = useState([]);
   const [images, setImages] = useState({});
@@ -38,19 +40,21 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
       setForm({
         name: editData.name || "",
         categoryId:
-        typeof editData.categoryId === "object"
-          ? editData.categoryId._id
-          : editData.categoryId || "",
-        sizeType: editData.sizeType || "alpha",
+          typeof editData?.categoryId === "object"
+            ? editData?.categoryId?._id
+            : editData?.categoryId || "",
+        sizeType: editData?.sizeType || "alpha",
       });
-      setDisplayOrder(editData.displayOrder || 0); // ✅ add
-      setShowOnHome(editData.showOnHome || false); // ✅ add
+      setDisplayOrder(editData?.displayOrder || 0); // ✅ add
+      setShowOnHome(editData?.showOnHome || false); // ✅ add
+      setSelectedGenders(editData?.gender || []);
+      setWearType(editData?.wearType || "");
       // ✅ VARIANT ATTRIBUTES
-      setVariantAttributes(editData.variantAttributes || []);
+      setVariantAttributes(editData?.variantAttributes || []);
 
       // ✅ ATTRIBUTES
-      if (editData.attributes) {
-        const formatted = Object.entries(editData.attributes).map(
+      if (editData?.attributes) {
+        const formatted = Object.entries(editData?.attributes).map(
           ([key, value]) => ({
             key,
             values: value.values.join(", "),
@@ -87,7 +91,13 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (selectedGenders.length === 0) {
+      return Swal.fire("Please select at least one gender");
+    }
 
+    if (!wearType) {
+      return Swal.fire("Please select wear type");
+    }
     try {
       setLoading(true);
 
@@ -103,6 +113,8 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
       formData.append("showOnHome", showOnHome);
       /* VARIANT ATTRIBUTES */
       formData.append("variantAttributes", JSON.stringify(variantAttributes));
+      formData.append("gender", JSON.stringify(selectedGenders));
+      formData.append("wearType", wearType);
 
       /* ATTRIBUTES JSON */
       const formattedAttributes = {};
@@ -122,6 +134,7 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
 
       formData.append("attributes", JSON.stringify(formattedAttributes));
       /* IMAGES */
+
       if (images.smallimage) {
         formData.append("smallimage", images.smallimage);
       }
@@ -133,6 +146,9 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
       if (editData) {
         await api.put(`/subcategory/${editData._id}`, formData);
       } else {
+        if (!images.smallimage) {
+          return Swal.fire("Please select image");
+        }
         await api.post("/subcategory", formData);
       }
 
@@ -169,40 +185,104 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
     <form onSubmit={handleSubmit} className="space-y-5 ">
       {/* NAME */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          type="text"
-          placeholder="SubCategory Name"
-          className="input-subCategory"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-
         {/* CATEGORY */}
-        <select
-          className="input-subCategory"
-          value={form.categoryId}
-          onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-          required
-        >
-          <option value="">Select Category</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Category
+          </label>
+          <select
+            className="input-subCategory"
+            value={form.categoryId}
+            onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+            required
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Sub Category Name
+          </label>
+          <input
+            type="text"
+            placeholder="SubCategory Name"
+            className="input-subCategory"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </div>
 
         {/* SIZE TYPE */}
-        <select
-          className="input-subCategory"
-          value={form.sizeType}
-          onChange={(e) => setForm({ ...form, sizeType: e.target.value })}
-        >
-          <option value="alpha">Alpha</option>
-          <option value="numeric">Numeric</option>
-          <option value="free">Free</option>
-        </select>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Select Size
+          </label>
+          <select
+            className="input-subCategory"
+            value={form.sizeType}
+            onChange={(e) => setForm({ ...form, sizeType: e.target.value })}
+            required
+          >
+            <option value="alpha">Alpha</option>
+            <option value="numeric">Numeric</option>
+            <option value="free">Free</option>
+          </select>
+        </div>
+
+        {/* WEAR TYPE */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Wear Type
+          </label>
+
+          <select
+            className="input-subCategory"
+            value={wearType}
+            onChange={(e) => setWearType(e.target.value)}
+            required
+          >
+            <option value="">Select Wear Type</option>
+            <option value="topwear">Topwear</option>
+            <option value="bottomwear">Bottomwear</option>
+            <option value="fullwear">Fullwear</option>
+            <option value="innerwear">Innerwear</option>
+          </select>
+        </div>
+      </div>
+
+      {/* GENDER */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Gender
+        </label>
+
+        <div className="flex gap-4 flex-wrap">
+          {["Men", "Women", "Kids", "Unisex"].map((g) => (
+            <label key={g} className="flex items-center gap-2 cursor-pointer">
+              <input
+                className="cursor-pointer"
+                type="checkbox"
+                checked={selectedGenders.includes(g)}
+                onChange={() => {
+                  if (selectedGenders.includes(g)) {
+                    setSelectedGenders(
+                      selectedGenders.filter((item) => item !== g),
+                    );
+                  } else {
+                    setSelectedGenders([...selectedGenders, g]);
+                  }
+                }}
+              />
+              {g}
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-2 flex justify-between px-2">
@@ -389,7 +469,7 @@ export const SubCategoryModal = ({ onSuccess, editData }) => {
         disabled={loading}
         className="bg-[#927f68] text-[#fdefdd] rounded-lg hover:bg-[#927f68]/80 py-2 w-full disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? "Creating..." : "Create SubCategory"}
+        {loading ? "Hold on..." : "Submit"}
       </button>
     </form>
   );
