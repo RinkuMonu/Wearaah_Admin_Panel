@@ -632,7 +632,7 @@ export default function LeadsPage() {
                         onChange={(e) =>
                           handleStatusChange(lead._id, e.target.value)
                         }
-                        className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white"
+                        className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white cursor-pointer"
                       >
                         <option value="new">New</option>
                         <option value="contacted">Contacted</option>
@@ -646,7 +646,7 @@ export default function LeadsPage() {
                     <td className="px-4 py-2">
                       <button
                         onClick={() => handleViewLead(lead)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                         title="View details"
                       >
                         <Eye className="w-4 h-4" />
