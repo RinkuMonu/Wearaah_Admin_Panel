@@ -5,8 +5,10 @@ import { useAuth } from "../../serviceAuth/context";
 import { Edit2, Save, X, Clock, MapPin, Store, Building2, Calendar, Truck } from "lucide-react";
 
 export default function ShopDetails({ seller }) {
-  const { sellerData } = useAuth();
-  const sellerDD = sellerData?.seller || seller || {};
+  // const { sellerData } = useAuth();
+  // const sellerDD = sellerData?.seller || seller || {};
+  
+const sellerDD =  seller;
   
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,25 +29,46 @@ export default function ShopDetails({ seller }) {
     }
   });
 
+  // useEffect(() => {
+  //   if (sellerDD) {
+  //     setFormData({
+  //       shopName: sellerDD.shopName || "",
+  //       businessType: sellerDD.businessType || "",
+  //       yearOfExperience: sellerDD.yearOfExperience || "",
+  //       shopStatus: sellerDD.shopStatus || "open",
+  //       deliveryRadiusInKm: sellerDD.deliveryRadiusInKm || "",
+  //       workingHours: sellerDD.workingHours || [],
+  //       pickupDelivery: sellerDD.pickupDelivery || {
+  //         street: "",
+  //         city: "",
+  //         state: "",
+  //         pincode: "",
+  //         country: ""
+  //       }
+  //     });
+  //   }
+  // }, [sellerDD]);
+
+
   useEffect(() => {
-    if (sellerDD) {
-      setFormData({
-        shopName: sellerDD.shopName || "",
-        businessType: sellerDD.businessType || "",
-        yearOfExperience: sellerDD.yearOfExperience || "",
-        shopStatus: sellerDD.shopStatus || "open",
-        deliveryRadiusInKm: sellerDD.deliveryRadiusInKm || "",
-        workingHours: sellerDD.workingHours || [],
-        pickupDelivery: sellerDD.pickupDelivery || {
-          street: "",
-          city: "",
-          state: "",
-          pincode: "",
-          country: ""
-        }
-      });
+  if (!sellerDD?._id) return;
+
+  setFormData({
+    shopName: sellerDD.shopName || "",
+    businessType: sellerDD.businessType || "",
+    yearOfExperience: sellerDD.yearOfExperience || "",
+    shopStatus: sellerDD.shopStatus || "open",
+    deliveryRadiusInKm: sellerDD.deliveryRadiusInKm || "",
+    workingHours: sellerDD.workingHours || [],
+    pickupDelivery: sellerDD.pickupDelivery || {
+      street: "",
+      city: "",
+      state: "",
+      pincode: "",
+      country: ""
     }
-  }, [sellerDD]);
+  });
+}, [sellerDD?._id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -107,7 +130,11 @@ export default function ShopDetails({ seller }) {
         pickupDelivery: formData.pickupDelivery
       };
 
-      const res = await api.put("/seller/profile/update", payload);
+      // const res = await api.put("/seller/profile/update", payload);
+
+const id = seller?.userId?._id;
+
+       const res = await api.put(`/seller/profile/update/${id}`, payload);
       
       if (res.data.success) {
         Swal.fire("Success", res.data.message || "Shop details updated successfully", "success");

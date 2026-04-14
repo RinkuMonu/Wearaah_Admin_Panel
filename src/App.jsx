@@ -71,6 +71,8 @@ function App() {
                 }
               >
                 <Route path="profile" element={<ProfilePage />} />
+                {/* <Route path="profile/:id" element={<ProfilePage />} /> */}
+
                 <Route path="product" element={<ProductPage />} />
                 <Route path="stock" element={<StockPage />} />
                 <Route path="brand" element={<BrandPage />} />
