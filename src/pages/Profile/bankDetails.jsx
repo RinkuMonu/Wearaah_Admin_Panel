@@ -276,6 +276,7 @@ export default function BankDetails({seller}) {
             onClick={() => setIsEditing(true)}
             className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
           >
+            
             <Edit2 className="w-4 h-4" />
             Edit
           </button>
