@@ -17,9 +17,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-export default function BankDetails() {
-  const { sellerData } = useAuth();
-  const sellerDD = sellerData?.seller || {};
+export default function BankDetails({seller}) {
+  // const { sellerData } = useAuth();
+  // const sellerDD = sellerData?.seller || {};
+
+    const sellerDD = seller;
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -197,7 +199,10 @@ export default function BankDetails() {
         UPI: formData.UPI.toLowerCase(),
       };
 
-      const res = await api.put("/seller/profile/update", payload);
+      // const res = await api.put("/seller/profile/update", payload);
+      const id = seller?.userId?._id;
+
+      const res = await api.put(`/seller/profile/update/${id}`, payload);
 
       if (res.data.success) {
         Swal.fire({

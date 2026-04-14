@@ -18,11 +18,38 @@ import {
   X,
 } from "lucide-react";
 
-export default function UserProfile() {
+export default function UserProfile({sellerId }) {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-  const { user, setUser, fetchProfile, fetchSellerData } = useAuth();
-  const userdata = user?.user || {};
+  const [userdata, setSellerData] = useState(null);
+
+  const { user } = useAuth();
+
+const loggedInUserId = user?.user?._id;
+const profileUserId = userdata?.userId?._id;
+
+const isSuperAdmin = user?.user?.role === "superadmin";
+const isOwnProfile = loggedInUserId === profileUserId;
+
+  useEffect(() => {
+  if (!sellerId) return;
+
+  const fetchSeller = async () => {
+    try {
+      const res = await api.get(`auth/seller/me/${sellerId}`);
+      setSellerData(res.data?.seller);
+    } catch (err) {
+      console.error("Seller fetch error:", err);
+    }
+  };
+
+  fetchSeller();
+}, [sellerId]);
+
+  // const { user, setUser, fetchProfile, fetchSellerData } = useAuth();
+  // const userdata = user?.user || {};
+  // const userdata = user?.user;
+  
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,17 +64,32 @@ export default function UserProfile() {
     platformId: "",
   });
 
-  useEffect(() => {
-    if (userdata) {
-      setFormData({
-        fullName: userdata.name || "",
-        email: userdata.email || "",
-        mobile: userdata.mobile || "",
-        platformId: userdata.platformId || "",
-      });
-      setAvatarPreview(userdata.avatar || "");
-    }
-  }, [userdata]);
+  // useEffect(() => {
+  //   if (userdata) {
+  //     setFormData({
+  //       fullName: userdata.name || "",
+  //       email: userdata.email || "",
+  //       mobile: userdata.mobile || "",
+  //       platformId: userdata.platformId || "",
+  //     });
+  //     setAvatarPreview(userdata.avatar || "");
+  //   }
+  // }, [userdata]);
+
+useEffect(() => {
+  if (!userdata?._id) return;
+
+  const user = userdata?.userId;
+
+  setFormData({
+    fullName: user?.name || "",
+    email: user?.email || "",
+    mobile: user?.mobile || "",
+    platformId: user?.platformId || "",
+  });
+
+  setAvatarPreview(user?.avatar || "");
+}, [userdata?._id]);
 
   // Validation functions
   const validateName = (name) => {
@@ -156,6 +198,15 @@ export default function UserProfile() {
       return;
     }
 
+    if (isSuperAdmin && !isOwnProfile) {
+  return Swal.fire({
+    title: "Not Allowed ❌",
+    text: "Superadmin cannot update other users' basic details",
+    icon: "warning",
+  });
+}
+    
+
     try {
       setLoading(true);
 
@@ -179,7 +230,7 @@ export default function UserProfile() {
           showConfirmButton: false,
         });
 
-        await fetchProfile();
+        // await fetchProfile();
         // await fetchSellerData(); // Refresh seller data if needed
 
         setIsEditing(false);
@@ -420,16 +471,16 @@ export default function UserProfile() {
         </div>
 
         {/* SHOP DETAILS SECTION */}
-        <ShopProfilePage />
+        <ShopProfilePage seller={userdata} />
 
         {/* BANK DETAILS SECTION */}
-        <BankDetails />
+        <BankDetails seller={userdata} />
 
         {/* KYC DETAILS SECTION */}
-        <KycDetails />
+        <KycDetails seller={userdata} />
 
         {/* SOCIAL DETAILS SECTION */}
-        <SocialDetails />
+        <SocialDetails seller={userdata} />
       </div>
     </div>
   );
