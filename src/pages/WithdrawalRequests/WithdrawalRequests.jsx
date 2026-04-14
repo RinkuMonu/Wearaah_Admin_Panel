@@ -27,21 +27,27 @@ import {
   Phone,
   MapPin,
   FileText,
+  PandaIcon,
+  Landmark,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import api from "../../serviceAuth/axios";
+import WithdrawalRequestModal from "./request.modal";
+import { useAuth } from "../../serviceAuth/context";
 
 export default function WithdrawalRequests() {
+  const { user } = useAuth();
   const [withdrawals, setWithdrawals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
     search: "",
-    status: "", 
+    status: "",
     paymentMethod: "",
     dateFrom: "",
     dateTo: "",
@@ -361,9 +367,18 @@ export default function WithdrawalRequests() {
           </div>
 
           <div className="flex items-center gap-2">
+            {user?.user.role !== "superadmin" && (
+              <button
+                onClick={() => setIsOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <Landmark className="w-4 h-4" />
+                Withdrawal
+              </button>
+            )}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -375,7 +390,7 @@ export default function WithdrawalRequests() {
             </button>
             <button
               onClick={fetchWithdrawals}
-              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="cursor-pointer p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               title="Refresh"
             >
               <RefreshCw
@@ -543,7 +558,7 @@ export default function WithdrawalRequests() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search by Request ID, User ID, Transaction ID..."
+                  placeholder="Search by Request ID, User ID..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={filters.search}
                   onChange={(e) => handleFilterChange("search", e.target.value)}
@@ -630,17 +645,18 @@ export default function WithdrawalRequests() {
                         {withdrawal.requestId}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Txn:{" "}
-                        {withdrawal.wallettransaction?.transactionId?.slice(-8)}
+                        ReqID: {withdrawal?.requestId}
                       </p>
                     </td>
                     <td className="px-4 py-3">
                       <div>
                         <p className="font-medium text-gray-900">
-                          {withdrawal.user?.platformId || "N/A"}
+                          {withdrawal.user?.name ||
+                            withdrawal.user?.email ||
+                            withdrawal.user?.mobile}
                         </p>
                         <p className="text-xs text-gray-500">
-                          ID: {withdrawal.user?._id?.slice(-6)}
+                          ID: {withdrawal.user?.platformId || "N/A"}
                         </p>
                       </div>
                     </td>
@@ -665,29 +681,30 @@ export default function WithdrawalRequests() {
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => handleViewDetails(withdrawal)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="cursor-pointer p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="View details"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        {withdrawal.status === "pending" && (
-                          <>
-                            <button
-                              onClick={() => handleApprove(withdrawal._id)}
-                              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                              title="Approve"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleReject(withdrawal._id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Reject"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
+                        {withdrawal.status === "pending" &&
+                          user?.user?.role === "superadmin" && (
+                            <>
+                              <button
+                                onClick={() => handleApprove(withdrawal._id)}
+                                className="cursor-pointer p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                title="Approve"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleReject(withdrawal._id)}
+                                className="cursor-pointer p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Reject"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
                       </div>
                     </td>
                   </tr>
@@ -776,7 +793,7 @@ export default function WithdrawalRequests() {
                   setShowDetails(false);
                   setSelectedRequest(null);
                 }}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X className="w-5 h-5 text-gray-600" />
               </button>
@@ -970,36 +987,37 @@ export default function WithdrawalRequests() {
 
             {/* Modal Footer */}
             <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-2">
-              {selectedRequest.status === "pending" && (
-                <>
-                  <button
-                    onClick={() => {
-                      setShowDetails(false);
-                      handleApprove(selectedRequest._id);
-                    }}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                  >
-                    <CheckCircle className="w-4 h-4" />
-                    Approve Request
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowDetails(false);
-                      handleReject(selectedRequest._id);
-                    }}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    Reject Request
-                  </button>
-                </>
-              )}
+              {selectedRequest.status === "pending" &&
+                user?.user?.role === "superadmin" && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setShowDetails(false);
+                        handleApprove(selectedRequest?._id);
+                      }}
+                      className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Approve Request
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDetails(false);
+                        handleReject(selectedRequest._id);
+                      }}
+                      className="cursor-pointer px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Reject Request
+                    </button>
+                  </>
+                )}
               <button
                 onClick={() => {
                   setShowDetails(false);
                   setSelectedRequest(null);
                 }}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className="cursor-pointer px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Close
               </button>
@@ -1007,6 +1025,7 @@ export default function WithdrawalRequests() {
           </div>
         </div>
       )}
+      <WithdrawalRequestModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 }

@@ -343,7 +343,7 @@ export default function WalletTransactions() {
           <div className="flex items-center gap-2">
             <button
               onClick={exportToCSV}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               disabled={transactions.length === 0}
             >
               <Download className="w-4 h-4" />
@@ -351,7 +351,7 @@ export default function WalletTransactions() {
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -361,7 +361,7 @@ export default function WalletTransactions() {
             </button>
             <button
               onClick={fetchTransactions}
-              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="cursor-pointer p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               title="Refresh"
             >
               <RefreshCw
@@ -404,7 +404,7 @@ export default function WalletTransactions() {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Completed</p>
+                <p className="text-sm text-gray-500">Completed Amount</p>
                 <p className="text-2xl font-bold text-green-600">
                   {stats.totalCompletedAmount || 0}
                 </p>
@@ -418,7 +418,7 @@ export default function WalletTransactions() {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Pending</p>
+                <p className="text-sm text-gray-500">Pending Amount</p>
                 <p className="text-2xl font-bold text-yellow-600">
                   {stats.totalPendingAmount || 0}
                 </p>
@@ -432,7 +432,7 @@ export default function WalletTransactions() {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Failed</p>
+                <p className="text-sm text-gray-500">Failed Amount</p>
                 <p className="text-2xl font-bold text-red-600">
                   {stats.totalFailedAmount || 0}
                 </p>
@@ -637,7 +637,7 @@ export default function WalletTransactions() {
             <div className="flex justify-end mt-4">
               <button
                 onClick={resetFilters}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="cursor-pointer px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Reset All Filters
               </button>
