@@ -53,10 +53,11 @@ export default function ContactPage() {
         }
     };
 
+
     return (
         <div className="p-6 overflow-hidden">
             <div className="flex justify-between items-center mb-6 bg-[#f5efdd] p-3 rounded-md">
-                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 font-semibold">
                     <Mail className="text-[#927f68]" /> Contact Messages
                 </h2>
             </div>

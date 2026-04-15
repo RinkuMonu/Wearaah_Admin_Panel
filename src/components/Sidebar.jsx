@@ -32,11 +32,11 @@ export default function Sidebar({ isOpen }) {
     .filter(Boolean);
 
   return (
-    <aside
-      className={`fixed top-13 left-0 h-screen bg-black text-gray-300
-      transition-all duration-300 z-50
-      ${isOpen ? "w-64" : "w-0"} overflow-hidden`}
-    >
+   <aside
+  className={`fixed top-13 left-0 h-[calc(100vh-52px)] bg-black text-gray-300
+  transition-all duration-300 z-50
+  ${isOpen ? "w-64" : "w-0"} overflow-y-auto`}
+>
       <div className="p-4">
         <nav className="space-y-2 mt-6">
           {/* ✅ USE filteredMenu HERE */}

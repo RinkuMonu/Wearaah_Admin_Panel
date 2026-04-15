@@ -5,6 +5,7 @@ import {
   IndianRupeeIcon,
   LayoutDashboard,
   ListOrderedIcon,
+  Mail,
   MessageSquare,
   ScanFace,
   ScanLine,
@@ -77,6 +78,7 @@ export const menuItems = [
       // { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
     ],
   },
+  
 
   {
     name: "Inventory",
@@ -158,12 +160,12 @@ export const menuItems = [
   //   ],
   // },
 
-  // {
-  //   name: "Contact",
-  //   path: "/contact",
-  //   icon: MessageSquare,
-  //   roles: ["superadmin", "employee"],
-  // },
+  {
+    name: "Contact",
+    path: "/contact",
+    icon: MessageSquare,
+    roles: ["superadmin", "employee"],
+  },
 
   {
     name: "FAQ Management",
@@ -171,4 +173,10 @@ export const menuItems = [
     icon: HelpCircle,
     roles: ["superadmin"],
   },
+  {
+  name: "Newsletter",
+  path: "/newsletter",
+  icon: Mail,
+  roles: ["superadmin"],
+},
 ];
