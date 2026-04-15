@@ -30,6 +30,9 @@ import RiderList from "./pages/UserManagement/rider";
 import SearchTest from "./components/test";
 import FAQPage from "./pages/FAQ/FAQPage";
 import CustomerList from "./pages/UserManagement/CustomerList";
+import RiderDetails from "./pages/Rider/RiderDetails";
+import RiderDetails1 from "./components/RiderDetails1";
+import RiderDetails2 from "./components/RiderDetails2";
 
 function App() {
   useEffect(() => {
@@ -78,6 +81,7 @@ function App() {
                 <Route path="contact" element={<ContactPage />} />
                 <Route path="quickbilling" element={<QuickBilling />} />
                 <Route path="qCProducts" element={<QCProductsList />} />
+                <Route path="riderregister" element={<RiderDetails2 />} />
                 <Route
                   path="wallettransactions"
                   element={<WalletTransactions />}

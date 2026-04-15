@@ -112,6 +112,12 @@ export const menuItems = [
     icon: UserCheck2,
     roles: ["superadmin"],
   },
+  {
+    name: "Rider Register",
+    path: "/riderregister",
+    icon: UserCheck2,
+    roles: ["superadmin", "seller"],
+  },
   // {
   //   name: "Employee",
   //   path: "/employee",
