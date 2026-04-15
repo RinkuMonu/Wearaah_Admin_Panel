@@ -26,13 +26,12 @@ import {
   UserCheck,
   UserX,
   Loader2,
-  BikeIcon,
   LucideBike,
 } from "lucide-react";
 import api from "../../serviceAuth/axios";
-import { RiderModal } from "./RiderModal";
+import { RiderModal } from "../UserManagement/RiderModal";
 
-export default function RiderList() {
+export default function PendingKycRiderList() {
   const [riders, setRiders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -44,7 +43,8 @@ export default function RiderList() {
     vehicleType: "",
     kycStatus: "",
     status: "",
-    availabilityStatus: "",
+    onlyPendingAndSubmit: true,
+    kycStep: "",
   });
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -77,14 +77,14 @@ export default function RiderList() {
       setError("");
 
       const params = new URLSearchParams();
+      params.append("onlyPendingAndSubmit", filters.onlyPendingAndSubmit);
       if (debouncedSearch) params.append("search", debouncedSearch);
       if (filters.city) params.append("city", filters.city);
       if (filters.vehicleType)
         params.append("vehicleType", filters.vehicleType);
       if (filters.kycStatus) params.append("kycStatus", filters.kycStatus);
       if (filters.status) params.append("status", filters.status);
-      if (filters.availabilityStatus)
-        params.append("availabilityStatus", filters.availabilityStatus);
+      if (filters.kycStep) params.append("kycStep", filters.kycStep);
       params.append("page", page);
       params.append("limit", limit);
 
@@ -121,7 +121,7 @@ export default function RiderList() {
     filters.vehicleType,
     filters.kycStatus,
     filters.status,
-    filters.availabilityStatus,
+    filters.kycStep,
     page,
     limit,
   ]);
@@ -301,26 +301,19 @@ export default function RiderList() {
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="flex justify-between gap-2.5">
-              <div>
-                <h1 className="flex justify-between gap-2 items-center text-2xl md:text-3xl font-bold text-gray-800">
-                  <LucideBike className="w-8 h-8 text-blue-600" />
-                  Rider Management
-                </h1>
-                <p className="text-sm text-gray-500 mt-1">
-                  Manage and monitor all seller accounts |{" "}
-                  <span className="text-ms font-medium">
-                    Total {totalCount}
-                  </span>
-                </p>
-              </div>
-            </div>
+            <h1 className="flex items-center gap-2 text-2xl md:text-3xl font-bold text-gray-800">
+              <LucideBike className="w-8 h-8 text-blue-600" />
+              Rider Management
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Manage and monitor all delivery riders
+            </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -330,13 +323,70 @@ export default function RiderList() {
             </button>
             <button
               onClick={fetchRiders}
-              className="cursor-pointer p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               title="Refresh"
             >
               <RefreshCw
                 className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
               />
             </button>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Riders</p>
+                <p className="text-2xl font-bold text-gray-800">{totalCount}</p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <User className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Submitted</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.totalSubmitKyc || 0}
+                </p>
+              </div>
+              <div className="p-3 bg-green-100 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Pending</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {stats.totalPendingKyc || 0}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <UserCheck className="w-5 h-5 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Blocked/Suspended</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {(stats.totalBlocked || 0) + (stats.totalSuspended || 0)}
+                </p>
+              </div>
+              <div className="p-3 bg-red-100 rounded-lg">
+                <UserX className="w-5 h-5 text-red-600" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -348,7 +398,7 @@ export default function RiderList() {
             <h3 className="font-semibold text-gray-800">Filter Riders</h3>
             <button
               onClick={() => setShowFilters(false)}
-              className="p-1 hover:bg-gray-100 rounded-lg cursor-pointer "
+              className="p-1 hover:bg-gray-100 rounded-lg"
             >
               <X className="w-4 h-4 text-gray-500" />
             </button>
@@ -364,7 +414,7 @@ export default function RiderList() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Name, mobile, email..."
+                    placeholder="ID, Name, email..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     value={filters.search}
                     onChange={(e) =>
@@ -392,9 +442,29 @@ export default function RiderList() {
                   <option value="EV">EV</option>
                 </select>
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Active
+                  KYC Status
+                </label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  value={filters.kycStatus}
+                  onChange={(e) =>
+                    setFilters({ ...filters, kycStatus: e.target.value })
+                  }
+                >
+                  <option value="">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="submitted">submitted</option>
+                  {/* <option value="verified">Verified</option> */}
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Rider Status
                 </label>
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -405,31 +475,30 @@ export default function RiderList() {
                 >
                   <option value="">All</option>
                   <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="suspended">Suspended</option>
+                  <option value="blocked">Blocked</option>
+                  <option value="inprogress">In Progress</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Availability Status
+                  KYC Step
                 </label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  value={filters.availabilityStatus}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={filters.kycStep}
                   onChange={(e) =>
-                    setFilters({
-                      ...filters,
-                      availabilityStatus: e.target.value,
-                    })
+                    setFilters({ ...filters, kycStep: e.target.value })
                   }
                 >
-                  <option value="">All</option>
-                  <option value="offline">Offline</option>
-                  <option value="online">Online</option>
-                  <option value="on_delivery">On Delivery</option>
-                  <option value="break">Break</option>
+                  <option value="">All Steps</option>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <option key={s} value={s}>
+                      Step {s}
+                    </option>
+                  ))}
                 </select>
               </div>
-
               <div className="flex justify-end mt-4">
                 <button
                   onClick={resetFilters}
@@ -471,14 +540,14 @@ export default function RiderList() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   KYC
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Availability Status
-                </th>
+                </th> */}
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Joined
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Kyc Step
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                   Actions
@@ -504,7 +573,7 @@ export default function RiderList() {
                       {Object.values(filters).some((v) => v) && (
                         <button
                           onClick={resetFilters}
-                          className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer "
+                          className="text-sm text-blue-600 hover:text-blue-800"
                         >
                           Clear filters
                         </button>
@@ -563,7 +632,7 @@ export default function RiderList() {
                       <div className="flex items-center gap-1">
                         {getVehicleIcon(rider.vehicleType)}
                         <span className="text-sm capitalize text-gray-900">
-                          {rider.vehicleType}
+                          {rider.vehicleType || "N/A"}
                         </span>
                       </div>
                     </td>
@@ -578,14 +647,7 @@ export default function RiderList() {
                     <td className="px-4 py-3">
                       {getKYCStatusBadge(rider.kycStatus)}
                     </td>
-                    <td className="px-4 py-3">
-                      {rider.user?.isActive
-                        ? getStatusBadge("active")
-                        : getStatusBadge("inactive")}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">
-                      {rider.availabilityStatus}
-                    </td>
+
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1 text-sm text-gray-600">
                         <Clock className="w-3 h-3" />
@@ -593,11 +655,24 @@ export default function RiderList() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
+                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                        <div className="w-full max-w-[100px] bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all"
+                            style={{ width: `${(rider?.kycStep / 5) * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-600 ml-2">
+                          Step {rider?.kycStep}/5
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
                         {/* VIEW BUTTON */}
                         <button
                           onClick={() => handleView(rider._id)}
-                          className="cursor-pointer p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
