@@ -31,6 +31,11 @@ import SearchTest from "./components/test";
 import FAQPage from "./pages/FAQ/FAQPage";
 import CustomerList from "./pages/UserManagement/CustomerList";
 import NewsletterPage from "./pages/Newsletter/NewsletterPage";
+import PendingKycRiderList from "./pages/Kyc Management/kycPendingRider";
+import PendingKycSellerList from "./pages/Kyc Management/kycPendingSeller";
+import RiderDetails from "./pages/Rider/RiderDetails";
+import RiderDetails1 from "./components/RiderDetails1";
+import RiderDetails2 from "./components/RiderDetails2";
 
 function App() {
   useEffect(() => {
@@ -61,6 +66,8 @@ function App() {
                 <Route path="SellerManagementTable" element={<SellerList />} />
                 <Route path="customers" element={<CustomerList />} />
                 <Route path="riderManagementTable" element={<RiderList />} />
+                <Route path="pendingKycRiderList" element={<PendingKycRiderList />} />
+                <Route path="pendingKycSellerList" element={<PendingKycSellerList />} />
                 <Route path="faq" element={<FAQPage />} />
                  <Route path="newsletter" element={<NewsletterPage />} />
               </Route>
@@ -82,6 +89,7 @@ function App() {
                 <Route path="contact" element={<ContactPage />} />
                 <Route path="quickbilling" element={<QuickBilling />} />
                 <Route path="qCProducts" element={<QCProductsList />} />
+                <Route path="riderregister" element={<RiderDetails2 />} />
                 <Route
                   path="wallettransactions"
                   element={<WalletTransactions />}

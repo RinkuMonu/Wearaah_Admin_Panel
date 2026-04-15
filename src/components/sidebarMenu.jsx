@@ -7,6 +7,7 @@ import {
   ListOrderedIcon,
   Mail,
   MessageSquare,
+  ScanFace,
   ScanLine,
   Truck,
   User2,
@@ -39,12 +40,29 @@ export const menuItems = [
         path: "/riderManagementTable",
         roles: ["superadmin"],
       },
-          {
-      name: "Customers",  // ✅ ADD THIS
-      path: "/customers",
-      roles: ["superadmin"],
-    },
+      {
+        name: "Customers", // ✅ ADD THIS
+        path: "/customers",
+        roles: ["superadmin"],
+      },
       // { name: "Vendors", path: "/purchase/vendors", roles: ["superadmin"] },
+    ],
+  },
+  {
+    name: "Kyc Management",
+    icon: ScanFace,
+    roles: ["superadmin"],
+    submenu: [
+      {
+        name: "Seller Kyc",
+        path: "/pendingKycSellerList",
+        roles: ["superadmin"],
+      },
+      {
+        name: "Rider Kyc",
+        path: "/pendingKycRiderList",
+        roles: ["superadmin"],
+      },
     ],
   },
   {
@@ -113,6 +131,12 @@ export const menuItems = [
     icon: UserCheck2,
     roles: ["superadmin"],
   },
+  {
+    name: "Rider Register",
+    path: "/riderregister",
+    icon: UserCheck2,
+    roles: ["superadmin", "seller"],
+  },
   // {
   //   name: "Employee",
   //   path: "/employee",
@@ -142,7 +166,7 @@ export const menuItems = [
     roles: ["superadmin", "employee"],
   },
 
-    {
+  {
     name: "FAQ Management",
     path: "/faq",
     icon: HelpCircle,
