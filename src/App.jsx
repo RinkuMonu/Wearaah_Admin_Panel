@@ -30,6 +30,7 @@ import RiderList from "./pages/UserManagement/rider";
 import SearchTest from "./components/test";
 import FAQPage from "./pages/FAQ/FAQPage";
 import CustomerList from "./pages/UserManagement/CustomerList";
+import NewsletterPage from "./pages/Newsletter/NewsletterPage";
 
 function App() {
   useEffect(() => {
@@ -61,6 +62,7 @@ function App() {
                 <Route path="customers" element={<CustomerList />} />
                 <Route path="riderManagementTable" element={<RiderList />} />
                 <Route path="faq" element={<FAQPage />} />
+                 <Route path="newsletter" element={<NewsletterPage />} />
               </Route>
               <Route element={<RoleProtectedRoute allowedRoles={["seller"]} />}>
                 {/* nothing */}
