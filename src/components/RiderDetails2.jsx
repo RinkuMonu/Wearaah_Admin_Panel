@@ -22,10 +22,16 @@ const RiderDetails2 = () => {
   const [done, setDone] = useState(false);
 
   const next = (data = {}) => {
+    const { resumeStep, ...rest } = data;
     setMeta((m) => ({ ...m, ...data }));
     if (step === 5) {
       setDone(true);
       return;
+    }
+    if (resumeStep && resumeStep > step) {
+      setStep(resumeStep);
+    } else {
+      setStep((s) => Math.min(s + 1, 5));
     }
     setStep((s) => Math.min(s + 1, 5));
   };

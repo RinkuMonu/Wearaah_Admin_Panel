@@ -86,6 +86,8 @@ const Step1 = ({ onNext }) => {
        
       );
         const data = kycRes.data;
+        const resumeStep = data.step || data.data?.step || 2;
+
       const userId =
       data.user._id|| data.data?.userId || data.data?._id;
        if (!userId) throw new Error("User ID not received");
@@ -93,6 +95,7 @@ const Step1 = ({ onNext }) => {
       onNext({
         userId,
         kyc: kycRes.data,
+        resumeStep 
       });
 
     } catch (err) {
@@ -177,7 +180,7 @@ const Step1 = ({ onNext }) => {
           <button
             onClick={sendOtp}
             disabled={loading}
-            className="w-full bg-[#e8c547] hover:bg-[#f0d060] disabled:opacity-40 text-[#0a0a0a] font-bold py-3.5 rounded-xl font-mono"
+            className="w-full bg-[#e8c547] hover:bg-[#f0d060] disabled:opacity-40 text-[#0a0a0a] font-bold py-3.5 rounded-xl font-mono cursor-pointer"
           >
             {loading ? "Sending OTP..." : "Send OTP →"}
           </button>
@@ -214,7 +217,7 @@ const Step1 = ({ onNext }) => {
           <button
             onClick={verifyOtp}
             disabled={loading}
-            className="w-full bg-[#e8c547] hover:bg-[#f0d060] disabled:opacity-40 text-[#0a0a0a] font-bold py-3.5 rounded-xl font-mono"
+            className="w-full bg-[#e8c547] hover:bg-[#f0d060] disabled:opacity-40 text-[#0a0a0a] font-bold py-3.5 rounded-xl font-mono cursor-pointer"
           >
             {loading ? "Verifying..." : "Verify OTP & Continue →"}
           </button>
