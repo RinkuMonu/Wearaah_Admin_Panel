@@ -50,6 +50,42 @@ export default function SuperAdminDashboard() {
   });
   const [loading, setLoading] = useState(false);
 
+  const [topSelling, setTopSelling] = useState([]);
+const [bestSelling, setBestSelling] = useState([]);
+const [leastSelling, setLeastSelling] = useState([]);
+
+const fetchProductMetrics = async () => {
+  try {
+    const [topRes, bestRes, leastRes] = await Promise.all([
+      api.get("/das/top-selling"),
+      api.get("/das/best-products"),
+      api.get("/das/least-selling"),
+    ]);
+
+    // 🔥 transform data for UI (important)
+    const transform = (data) =>
+      data.map((item) => ({
+        name: item.name,
+        bills: item.totalOrders,
+        qty: item.totalSold,
+        // amount: item.totalSold * 100, // dummy (since backend price nahi de raha)
+        // profit: item.totalSold * 100,
+        // percent: item.totalOrders ? (item.totalSold / item.totalOrders) * 10 : 0,
+      }));
+
+    setTopSelling(transform(topRes.data.data));
+    setBestSelling(transform(bestRes.data.data));
+    setLeastSelling(transform(leastRes.data.data));
+
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+useEffect(() => {
+  fetchProductMetrics();
+}, []);
+
   const fetchDashboard = async () => {
     setLoading(true);
     try {
@@ -145,60 +181,9 @@ export default function SuperAdminDashboard() {
     );
   }, [startDate, endDate]);
 
-  // Static best products data - KEEP AS IS
-  const bestProducts = [
-    {
-      name: "Co Men's plain satin shirt",
-      bills: 10,
-      qty: 17,
-      amount: 22706.5,
-      profit: 22706.5,
-      percent: 17.91,
-    },
-    {
-      name: "Co Men's Straight fit",
-      bills: 7,
-      qty: 12,
-      amount: 31709.55,
-      profit: 31709.55,
-      percent: 25.01,
-    },
-    {
-      name: "Boot Cut Formal Pant",
-      bills: 5,
-      qty: 5,
-      amount: 9895.85,
-      profit: 9895.85,
-      percent: 7.8,
-    },
-  ];
 
-  const leastProducts = [
-    {
-      name: "Half Shirt",
-      bills: 1,
-      qty: 1,
-      amount: 1102.15,
-      profit: 1102.15,
-      percent: 4.11,
-    },
-    {
-      name: "T-shirt",
-      bills: 1,
-      qty: 1,
-      amount: 799.2,
-      profit: 799.2,
-      percent: 2.98,
-    },
-    {
-      name: "Naylon Tery Cargo",
-      bills: 1,
-      qty: 1,
-      amount: 974.25,
-      profit: 974.25,
-      percent: 3.63,
-    },
-  ];
+
+
 
   // Now conditional return after all hooks
   if (loading && !data) return (
@@ -346,7 +331,7 @@ export default function SuperAdminDashboard() {
           <Boxes size={18} className="text-purple-500" />
           <span>Sales Qty: <b>{product.qty}</b></span>
         </div>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <IndianRupee size={18} className="text-emerald-500" />
           <span>Sales: <b>₹{product.amount}</b></span>
         </div>
@@ -357,7 +342,7 @@ export default function SuperAdminDashboard() {
         <div className="flex items-center gap-2 col-span-2">
           <Percent size={18} className="text-orange-500" />
           <span>Sales %: <b>{product.percent}%</b></span>
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -373,9 +358,9 @@ export default function SuperAdminDashboard() {
               <th className="px-3 w-[30%]">Product Name</th>
               <th className="px-3 w-[10%]">Bills</th>
               <th className="px-3 w-[10%]">Qty</th>
-              <th className="px-3 w-[14%]">Amount</th>
-              <th className="px-3 w-[10%]">Profit</th>
-              <th className="px-3 w-[6%]">sales(%)</th>
+              {/* <th className="px-3 w-[14%]">Amount</th> */}
+              {/* <th className="px-3 w-[10%]">Profit</th> */}
+              {/* <th className="px-3 w-[6%]">sales(%)</th> */}
             </tr>
           </thead>
         </table>
@@ -391,13 +376,13 @@ export default function SuperAdminDashboard() {
                 </td>
                 <td className="px-3 w-[10%]">{product.bills}</td>
                 <td className="px-3 w-[10%]">{product.qty}</td>
-                <td className="px-3 w-[14%] font-semibold">
+                {/* <td className="px-3 w-[14%] font-semibold">
                   ₹{product.amount}
                 </td>
                 <td className="px-3 w-[10%] font-semibold">
                   ₹{product.profit}
                 </td>
-                <td className="px-3 w-[6%]">{product.percent}%</td>
+                <td className="px-3 w-[6%]">{product.percent}%</td> */}
               </tr>
             ))}
           </tbody>
@@ -406,18 +391,23 @@ export default function SuperAdminDashboard() {
     </div>
   );
 
-  const sections = [
-    {
-      title: "Best Selling Product",
-      type: "best",
-      products: bestProducts,
-    },
-    {
-      title: "Least Selling Product",
-      type: "least",
-      products: leastProducts,
-    },
-  ];
+const sections = [
+  {
+    title: "Top Selling Product",
+    type: "best",
+    products: topSelling,
+  },
+  {
+    title: "Best Selling Product",
+    type: "best",
+    products: bestSelling,
+  },
+  {
+    title: "Least Selling Product",
+    type: "least",
+    products: leastSelling,
+  },
+];
 
   return (
     <div className="space-y-8 mt-5">
@@ -497,7 +487,36 @@ export default function SuperAdminDashboard() {
         </div>
       </div>
 
-      {/* Graph Section */}
+    
+
+      {/* Product Section */}
+      <div className="grid md:grid-cols-3 gap-6">
+        {sections.map((section, i) => {
+          const topProduct = section.products[0];
+          const remainingProducts = section.products.slice(1);
+
+          return (
+            <div key={i}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-700">
+                  {section.title}
+                </h2>
+                {/* <div className="bg-gray-100 px-3 py-1 text-sm">
+                  {startDate} - {endDate}
+                </div> */}
+              </div>
+              {topProduct && (
+                <ProductCard product={topProduct} type={section.type} />
+              )}
+              {remainingProducts.length > 0 && (
+                <ProductTable products={remainingProducts} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+        {/* Graph Section */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Sales V/S Purchase */}
         <div className="bg-white p-5 shadow-md rounded-xl">
@@ -531,137 +550,6 @@ export default function SuperAdminDashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Right Side Cards */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Promotional Sales Card */}
-          <div className="bg-white p-5 shadow-md rounded-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-bold text-gray-700">Promotional Sales</h2>
-              <select className="border border-gray-200 px-2 py-1 rounded text-sm">
-                <option>Weekly</option>
-                <option>Monthly</option>
-                <option>Yearly</option>
-              </select>
-            </div>
-            <div className="relative h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={[
-                      { name: "Social Media", value: 400 },
-                      { name: "Website", value: 300 },
-                      { name: "Store", value: 300 },
-                    ]}
-                    innerRadius={70}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    <Cell fill="#f97316" />
-                    <Cell fill="#3b82f6" />
-                    <Cell fill="#8b5cf6" />
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-gray-500 text-sm">Store</p>
-                <h3 className="text-xl font-bold">1,016</h3>
-                <p className="text-green-500 text-sm">+2.1%</p>
-              </div>
-            </div>
-            <div className="flex justify-center gap-6 mt-4 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
-                Social Media
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
-                Website
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
-                Store
-              </div>
-            </div>
-          </div>
-
-          {/* Top Sale Card */}
-          <div className="bg-white p-5 shadow-md rounded-xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-bold text-gray-700">Top Sale</h2>
-              <select className="border border-gray-200 px-2 py-1 rounded text-sm">
-                <option>Weekly</option>
-                <option>Monthly</option>
-                <option>Yearly</option>
-              </select>
-            </div>
-            <div className="space-y-4">
-              {[
-                {
-                  name: "Neptune Longsleeve",
-                  price: "138",
-                  sales: 952,
-                  img: "https://i.pravatar.cc/50?img=1",
-                },
-                {
-                  name: "Ribbed Tank Top",
-                  price: "108",
-                  sales: 902,
-                  img: "https://i.pravatar.cc/50?img=2",
-                },
-                {
-                  name: "Oversized Motif T",
-                  price: "98",
-                  sales: 882,
-                  img: "https://i.pravatar.cc/50?img=3",
-                },
-              ].map((item, index) => (
-                <div key={index} className="flex justify-between items-center border-b pb-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={item.img}
-                      alt={item.name}
-                      className="w-10 h-10 rounded object-cover"
-                    />
-                    <div>
-                      <p className="font-medium text-sm">{item.name}</p>
-                      <p className="text-xs text-gray-500">{item.price}</p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-semibold">{item.sales} Sales</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Product Section */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {sections.map((section, i) => {
-          const topProduct = section.products[0];
-          const remainingProducts = section.products.slice(1);
-
-          return (
-            <div key={i}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-700">
-                  {section.title}
-                </h2>
-                <div className="bg-gray-100 px-3 py-1 text-sm">
-                  {startDate} - {endDate}
-                </div>
-              </div>
-              {topProduct && (
-                <ProductCard product={topProduct} type={section.type} />
-              )}
-              {remainingProducts.length > 0 && (
-                <ProductTable products={remainingProducts} />
-              )}
-            </div>
-          );
-        })}
       </div>
     </div>
   );

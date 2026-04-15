@@ -31,8 +31,12 @@ import {
 } from "lucide-react";
 import api from "../../serviceAuth/axios";
 import { SellerModal } from "./sellerViewModal";
+import { useNavigate } from "react-router-dom";
+
 
 export default function SellerList() {
+  const navigate = useNavigate();
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -97,8 +101,10 @@ export default function SellerList() {
       });
 
       setData(res.data.sellers || []);
-      setTotalPages(res.data.totalPages || 1);
-      setTotalCount(res.data.totalCount || 0);
+      // setTotalPages(res.data.totalPages || 1);
+      // setTotalCount(res.data.totalCount || 0);
+      setTotalPages(res.data.pages || 1);
+setTotalCount(res.data.total || 0);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load sellers");
       Swal.fire("Error", "Failed to load sellers", "error");
@@ -110,7 +116,6 @@ export default function SellerList() {
   useEffect(() => {
     fetchSellers();
   }, [debouncedSearch, filters.kycStatus, filters.kycStep, filters.isApproved, page, limit]);
-
 
 
 
@@ -305,7 +310,7 @@ export default function SellerList() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Name, mobile, email..."
+                    placeholder="Name"
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
@@ -528,6 +533,16 @@ export default function SellerList() {
                           {seller.userId?.isActive ? "Active" : "Blocked"}
                         </span>
                       </button>
+
+
+
+                      <button
+  onClick={() => navigate(`/profile?id=${seller.userId?._id}`)}
+  className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+  title="Edit seller"
+>
+  ✏️
+</button>
                     </td>
                   </tr>
                 ))

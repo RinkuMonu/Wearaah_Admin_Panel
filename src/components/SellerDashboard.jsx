@@ -22,6 +22,7 @@ export default function SellerDashboard() {
   const [data, setData] = useState(null);
   const [startDate, setStartDate] = useState("2026-02-09");
   const [endDate, setEndDate] = useState("2026-02-15");
+  
 
   const fetchDashboard = async () => {
     try {
@@ -246,7 +247,7 @@ export default function SellerDashboard() {
         </div>
 
         {/* Best Selling Products Preview */}
-        <div className="bg-white p-5 shadow-md rounded-xl">
+        {/* <div className="bg-white p-5 shadow-md rounded-xl">
           <h2 className="font-bold text-gray-700 mb-4">Top Products</h2>
           <div className="space-y-3">
             {bestProducts.slice(0, 3).map((product, idx) => (
@@ -262,7 +263,7 @@ export default function SellerDashboard() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Orders Summary */}

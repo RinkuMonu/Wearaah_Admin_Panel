@@ -17,9 +17,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-export default function BankDetails() {
-  const { sellerData } = useAuth();
-  const sellerDD = sellerData?.seller || {};
+export default function BankDetails({seller}) {
+  // const { sellerData } = useAuth();
+  // const sellerDD = sellerData?.seller || {};
+
+    const sellerDD = seller;
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -197,7 +199,10 @@ export default function BankDetails() {
         UPI: formData.UPI.toLowerCase(),
       };
 
-      const res = await api.put("/seller/profile/update", payload);
+      // const res = await api.put("/seller/profile/update", payload);
+      const id = seller?.userId?._id;
+
+      const res = await api.put(`/seller/profile/update/${id}`, payload);
 
       if (res.data.success) {
         Swal.fire({
@@ -271,6 +276,7 @@ export default function BankDetails() {
             onClick={() => setIsEditing(true)}
             className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
           >
+            
             <Edit2 className="w-4 h-4" />
             Edit
           </button>

@@ -182,7 +182,9 @@ export default function Header({ toggleSidebar }) {
 
                 <div className="py-2 text-sm">
                   <Link
-                    to="/profile"
+                    // to="/profile"
+                      to={`/profile?id=${user?.user?._id}`}
+
                     className="w-full flex items-center gap-3 px-4 py-2 bg-[#f5efdd] text-[#927f68] hover:bg-gray-100"
                   >
                     <User size={16} />

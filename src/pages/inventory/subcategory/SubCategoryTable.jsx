@@ -4,6 +4,7 @@ import { debounce } from "lodash";
 import { useMemo } from "react";
 import api from "../../../serviceAuth/axios";
 import { SubCategoryModal } from "./SubCategoryModal";
+import { AlertCircle, Check, CheckLine, Link2, Link2Off } from "lucide-react";
 
 export const SubCategoryTable = () => {
   const [data, setData] = useState([]);
@@ -67,7 +68,7 @@ export const SubCategoryTable = () => {
     if (!result.isConfirmed) return;
 
     try {
-      const resss = await api.delete(`/subcategory/${id}`);
+      const resss = await api.put(`/subcategory/status/${id}`);
       console.log(resss);
       Swal.fire({
         icon: "success",
@@ -328,8 +329,8 @@ export const SubCategoryTable = () => {
                         <p className="text-sm font-medium text-gray-900">
                           {item.name}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          ID: {item._id.slice(-6)}
+                        <p className="text-xs text-yellow-500 mt-0.5">
+                          display number: {item.displayOrder}
                         </p>
                       </div>
                     </div>
@@ -337,8 +338,7 @@ export const SubCategoryTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-md flex items-center justify-center text-white text-xs font-medium">
-                        {item.parentCategory?.name?.charAt(0).toUpperCase() ||
-                          "?"}
+                        {item.categoryId?.name?.charAt(0).toUpperCase() || "?"}
                       </div>
                       <span className="ml-2 text-sm text-gray-600">
                         {item.categoryId?.name || "No Category"}
@@ -362,8 +362,10 @@ export const SubCategoryTable = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-600 rounded-full">
-                      Active
+                    <span
+                      className={`px-3 py-1 text-xs font-medium  ${item.isActive ? " text-green-600 bg-green-100" : "text-gray-500 bg-gray-300"} rounded-full`}
+                    >
+                      {item.isActive ? "Active" : "InActive"}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -395,19 +397,7 @@ export const SubCategoryTable = () => {
                         className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                         title="Delete subcategory"
                       >
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                        {item.isActive ? <Link2 size={18} /> : <Link2Off size={18} />}
                       </button>
                     </div>
                   </td>

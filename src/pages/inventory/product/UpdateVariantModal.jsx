@@ -581,14 +581,14 @@ export default function UpdateVariantModal({
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Platform Fee (10%)</span>
+                    <span className="text-gray-600">Platform Fee (0%)</span>
                     <span className="font-medium text-red-500">
                       -₹{platformFee.toFixed(2)}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Payment Fee (2%)</span>
+                    <span className="text-gray-600">Payment Fee (0%)</span>
                     <span className="font-medium text-red-500">
                       -₹{paymentFee.toFixed(2)}
                     </span>

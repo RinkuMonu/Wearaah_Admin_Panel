@@ -250,9 +250,9 @@ export default function CategoryTable() {
                 <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
+                {/* <th className="px-6 py-4 text-left text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   Banner
-                </th>
+                </th> */}
                 <th className="px-6 py-4 text-start text-xs font-medium text-[#f5efdd] uppercase tracking-wider">
                   Actions
                 </th>
@@ -312,14 +312,14 @@ export default function CategoryTable() {
                       {item.isActive ? "Active" : "inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  {/* <td className="px-6 py-4">
                     <div className="w-full h-full rounded-lg flex ">
                       <img
                         src={`${BASE_URL}${item.bannerimage}`}
                         className="w-50 h-22"
                       />
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4">
                     <div className="flex items-center  gap-2">
                       <button

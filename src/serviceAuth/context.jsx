@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.getItem("authToken") || null,
   );
   const [user, setUser] = useState(null);
-  const [sellerData, setSellerData] = useState(null);
 
   const setToken = (newToken) => {
     if (newToken) {
@@ -25,6 +24,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     }
   };
+  
   const fetchProfile = async () => {
     if (!token) return;
 
@@ -36,18 +36,7 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
     }
   };
-  const fetchSellerData = async () => {
-    if (!token) return;
 
-    try {
-      const res = await api.get("/auth/seller/me");
-      // console.log("Seller Data:", res.data);
-      setSellerData(res.data);
-    } catch (err) {
-      console.error("Failed to fetch seller data:", err);
-      setToken(null);
-    }
-  };
   useEffect(() => {
     if (!user?.user?._id) return;
 
@@ -66,12 +55,13 @@ export const AuthProvider = ({ children }) => {
     };
   }, [user]);
 
+
   useEffect(() => {
-    fetchProfile();
-    if (user && user?.user?.role === "seller") {
-      fetchSellerData();
+    if (token) {
+      fetchProfile();
     }
-  }, [user?.user?.role]);
+  }, [token]);
+
 
   const fetchMissedOrders = async () => {
     try {
@@ -129,7 +119,6 @@ export const AuthProvider = ({ children }) => {
         setUser,
         fetchProfile,
         setUnseenCount,
-        sellerData,
         unseenCount,
         fetchMissedOrders,
         fetchWallet,

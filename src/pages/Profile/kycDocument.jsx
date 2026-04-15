@@ -24,10 +24,14 @@ import {
   FileArchive,
 } from "lucide-react";
 
-export default function KycDetails() {
+export default function KycDetails({seller}) {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
-  const { sellerData } = useAuth();
-  const sellerDD = sellerData?.seller || {};
+
+  // const { sellerData } = useAuth();
+  // // const sellerDD = sellerData?.seller || {};
+  // const sellerDD = sellerData?.seller;
+
+    const sellerDD = seller;
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,15 +43,26 @@ export default function KycDetails() {
   const [existingDocuments, setExistingDocuments] = useState({});
   const [errors, setErrors] = useState({});
 
+  // useEffect(() => {
+  //   if (sellerDD) {
+  //     setFormData({
+  //       PAN: sellerDD.PAN || "",
+  //       GSTIN: sellerDD.GSTIN || "",
+  //     });
+  //     setExistingDocuments(sellerDD.kycDocuments || {});
+  //   }
+  // }, [sellerDD]);
+
   useEffect(() => {
-    if (sellerDD) {
-      setFormData({
-        PAN: sellerDD.PAN || "",
-        GSTIN: sellerDD.GSTIN || "",
-      });
-      setExistingDocuments(sellerDD.kycDocuments || {});
-    }
-  }, [sellerDD]);
+  if (!sellerDD?._id) return;
+
+  setFormData({
+    PAN: sellerDD?.PAN || "",
+    GSTIN: sellerDD?.GSTIN || "",
+  });
+
+  setExistingDocuments(sellerDD?.kycDocuments || {});
+}, [sellerDD?._id]); // ✅ FIX
 
   // Validation functions
   const validatePAN = (pan) => {
@@ -177,7 +192,16 @@ export default function KycDetails() {
         }
       });
 
-      const res = await api.put("/seller/profile/update", formDataPayload, {
+      
+      // const res = await api.put("/seller/profile/update", formDataPayload, {
+
+        const id = seller?.userId?._id;
+
+          const res = await api.put(
+      `/seller/profile/update/${id}`,
+      formDataPayload,
+      {
+
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -227,7 +251,7 @@ export default function KycDetails() {
   };
 
   const getKycStatusBadge = () => {
-    const status = sellerDD.kycStatus;
+    const status = sellerDD?.kycStatus;
     switch (status) {
       case "approved":
         return {
@@ -265,7 +289,7 @@ export default function KycDetails() {
         <div className="flex items-center gap-2">
           <Shield className="w-5 h-5 text-blue-600" />
           <h3 className="font-semibold text-lg text-gray-800">KYC Details</h3>
-          {sellerDD.kycStatus && (
+          {sellerDD?.kycStatus && (
             <span
               className={`ml-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusBadge.color}`}
             >
@@ -460,7 +484,7 @@ export default function KycDetails() {
         </div>
 
         {/* Rejection Reason (if rejected) */}
-        {sellerDD.kycStatus === "rejected" && sellerDD.rejectionReason && (
+        {sellerDD?.kycStatus === "rejected" && sellerDD?.rejectionReason && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm font-medium text-red-800 flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
