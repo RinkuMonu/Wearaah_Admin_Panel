@@ -20,21 +20,22 @@ const RiderDetails2 = () => {
   const [step, setStep] = useState(1);
   const [meta, setMeta] = useState({ userId: null, token: null });
   const [done, setDone] = useState(false);
+const next = (data = {}) => {
+  const { resumeStep, ...rest } = data;
 
-  const next = (data = {}) => {
-    const { resumeStep, ...rest } = data;
-    setMeta((m) => ({ ...m, ...data }));
-    if (step === 5) {
-      setDone(true);
-      return;
-    }
-    if (resumeStep && resumeStep > step) {
-      setStep(resumeStep);
-    } else {
-      setStep((s) => Math.min(s + 1, 5));
-    }
+  setMeta((m) => ({ ...m, ...rest }));
+
+  if (step === 5) {
+    setDone(true);
+    return;
+  }
+
+  if (resumeStep && resumeStep > step) {
+    setStep(resumeStep);
+  } else {
     setStep((s) => Math.min(s + 1, 5));
-  };
+  }
+};
 
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
