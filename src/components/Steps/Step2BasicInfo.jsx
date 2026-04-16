@@ -181,14 +181,14 @@ const submit = async () => {
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 border border-[#2a2a2a] hover:border-[#444] text-[#888] font-mono py-3.5 rounded-xl transition-all text-sm"
+          className="flex-1 border border-[#2a2a2a] cursor-pointer hover:border-[#444] text-[#888] font-mono py-3.5 rounded-xl transition-all text-sm"
         >
           ← Back
         </button>
         <button
           onClick={submit}
           disabled={loading}
-          className="flex-[2] bg-[#e8c547] hover:bg-[#f0d060] disabled:opacity-40 disabled:cursor-not-allowed text-[#0a0a0a] font-bold py-3.5 rounded-xl transition-all duration-200 font-mono text-sm tracking-wide"
+          className="flex-[2] bg-[#e8c547] cursor-pointer hover:bg-[#f0d060] disabled:opacity-40 disabled:cursor-not-allowed text-[#0a0a0a] font-bold py-3.5 rounded-xl transition-all duration-200 font-mono text-sm tracking-wide"
         >
           {loading ? "Saving..." : "Continue →"}
         </button>
